@@ -1,0 +1,604 @@
+#+OPTIONS: num:nil
+Rubyfying Javascript:  Avoiding jQuery Spaghetti
+
+* Intro
+One of the joys of Opal is how it produces, better code.  Opal
+accomplishes this in large part by addressing a number Opal JavaScript
+Anti Patterns, henceforth OJSAPs. In this episode we examine a real
+life example of how it addresses OJSAP I call "jQuery spaghetti."
+
+* Desired Result
+
+My app had the need for a slide out sidebar -- 2 sidebars, in fact.
+Some googling yielded a jsfiddle which demonstrated the sidebar effect I
+wanted with a minimum of html, css, and js.
+http://jsfiddle.net/dmyTR/37/
+
+I took the initial code and adapted it to my needs. To check the
+viability of a right sidebar, I initially copied the code and modified
+it to make on.  Now that I proved the concept, it was time to fix the
+code. Rather than refactoring the Javascript 1st, I would convert it
+to Opal in this stage. This was a place I knew that Opal would shine.
+
+* Starting code
+Let's look at the modified jsfiddle code in it's cut and pasted (anti) glory.
+#+BEGIN_SRC javascript
+  $.asm = {};
+  $.asm.panels = 1;
+
+  function sidebar(panels) {
+      $.asm.panels = panels;
+      if (panels === 1) {
+          $('#sidebar').animate({
+              left: -180,
+          });
+      } else if (panels === 2) {
+          $('#sidebar').animate({
+              left: 20,
+          });
+          $('#sidebar').height($(window).height() - 50);
+      }
+  };
+
+  $(function() {
+      $('#toggleSidebar').click(function() {
+          if ($.asm.panels === 1) {
+              $('#toggleSidebar i').addClass('glyphicon-chevron-left');
+              $('#toggleSidebar i').removeClass('glyphicon-chevron-right');
+              return sidebar(2);
+          } else {
+              $('#toggleSidebar i').removeClass('glyphicon-chevron-left');
+              $('#toggleSidebar i').addClass('glyphicon-chevron-right');
+              return sidebar(1);
+          }
+      });
+  });
+  $.asm2 = {};
+  $.asm2.panels = 1;
+
+  function sidebar2(panels) {
+      $.asm2.panels = panels;
+      if (panels === 1) {
+          $('#sidebar-right').animate({
+              right: -780,
+          });
+      } else if (panels === 2) {
+          $('#sidebar-right').animate({
+              right: 20,
+          });
+          $('#mapCanvas').width($('#mapCanvas').parent().width());
+          $('#mapCanvas').height($(window).height() - 50);
+          $('#sidebar-right').height($(window).height() - 50);
+      }
+  };
+
+
+  $(function() {
+      $('#toggleSidebar-right').click(function() {
+          if ($.asm2.panels === 1) {
+              $('#toggleSidebar-right i').removeClass('glyphicon-chevron-left');
+              $('#toggleSidebar-right i').addClass('glyphicon-chevron-right');
+              return sidebar2(2);
+          } else {
+              $('#toggleSidebar-right i').addClass('glyphicon-chevron-left');
+              $('#toggleSidebar-right i').removeClass('glyphicon-chevron-right');
+              return sidebar2(1);
+          }
+      });
+
+  });
+#+END_SRC
+
+* So yes, this is ugly code
+No fault of the author, it is a jsfiddle thrown together to answer a
+stackoverflow question, so it's quick and dirty code.  Unfortunately,
+this sort of code often ends up being production code. So that I could
+protopye a particular interface, I shamelessly cut and pasted the
+original until I could prove viability of my idea. Once I knew the interface
+could work, it was convert and refactor the code.
+
+* So what's the 1st step?
+
+** Just translate?
+
+The natural step is to just translate the Javascript more or less line
+by line into Opal.  I took a stab at that, focusing on the document
+ready part.
+
+#+BEGIN_SRC javascript
+Document.ready? {
+  Element.find('#toggleSidebar').on :click {
+  }
+#+END_SRC
+
+Just 3 lines in I realized I didn't want to go that.  It just didn't
+feel right (didn't feel right), what's my intent?
+
+** Begin with the end in mind - Steven Covey
+For fear of getting lost in the details, I aborted a line by line
+translation would not end up with the.  I started with an interace that I would
+want to use and reuse.
+
+** Reasons Opal/Ruby makes your browser code better (ROMYBCB) #1 - Think in objects
+
+Taking a Ruby mindset, I always think in terms of objects - Object
+Oriented programming is basically the Ruby Way.  It's easy, the
+example code are written this way, etc.  While you can can do OO
+programming in Javascript, things aren't typically as easy, and it's not
+universally encouraged.
+
+intent. I want this object to be easily manipulated elsewhere, also
+showing my intent.  Something like this:
+
+#+BEGIN_SRC ruby
+  # Create w/intent
+  left_sidebar = Sidebar.new('#toggleSidebar', 'left')
+  # elsewhere manipulate
+  left_sidebar.hide
+#+END_SRC
+
+With this as the desired interface, we see that we have a Sidebar, so
+lets start building it.  The major part of the original code is in the
+click handler which allows the sidebar to slide in and out. Lets'
+start with that.
+
+#+BEGIN_SRC javascript
+  // original code
+  $(function() {
+      $('#toggleSidebar').click(function() {
+          if ($.asm.panels === 1) {
+              $('#toggleSidebar i').addClass('glyphicon-chevron-left');
+              $('#toggleSidebar i').removeClass('glyphicon-chevron-right');
+              return sidebar(2);
+          } else {
+              $('#toggleSidebar i').removeClass('glyphicon-chevron-left');
+              $('#toggleSidebar i').addClass('glyphicon-chevron-right');
+              return sidebar(1);
+          }
+      });
+  });
+#+END_SRC
+
+** Details of the original code
+- click handler is added to #toggleSidebar
+- state is stored in $.asm.panels variable to know whether the
+panel is open.  This is not atypical jQuery code, but reeks of the jQuery
+Spaghetti and other JS antipatterns I'm trying to get away from.
+
+** jQuery Spaghetti things that make the Rubyist cringe
+
+- $.asm.panels to store state. Yuck!
+  - $.asm looks like assembly code.  I try hard to get away from assembly where possible and appropriate
+  - Where do we store state in Javascript (OJSAP 2)?
+    - With jQuery, we can hang it off of jQuery, which becomes the equivalent of a global object.
+      - Why? Because it's easy and there are plenty of examples of such
+    - Make a class and storing it as instance variable? That's just is just too much boiler plate code in Javascript...
+  - What happens when we need more than 1 set of state? In my case, I want 2 sidebars, so the "global" needs to be duplicated
+- Magic numbers $.asm.panels === 1 $.asm.panels === 2 -- which one is open, which is close. A little too "bad C"-like IMO
+- The spaghetti itself. DOM objects and css sprinkled in randomly.  What files might those be in?  Going a step further than this post, lissio allows one to put all those concerns cohesively in 1 place
+
+* The click handler
+
+We'll start with the click handler.  The intention of the original
+handler is mired in the details (OJSAP 5). Let's bring that front and
+center "If the sidebar is open, close it; else open it."  Let's have
+the code express this intent.
+
+#+BEGIN_SRC ruby
+
+class Sidebar
+  def initialize(element_id, side)
+    @state = :closed
+    Element.find(element_id).on :click {
+      if @state  == :open
+        close
+      else
+        open
+      end
+    }
+  end
+end
+
+#+END_SRC
+
+I think that's pretty clear.  Already an improvement, IMO.
+
+Let's contrast coding this in Opal vs Javascript
+- In the original Javascript, he hung the example on $.asm.panels, possibly because it was a convenient place to hand the data since the original code was not dealing with objects.  With opal we have a natural place to place the state - instance variables. On creation, we start off with the sidebar in a closed state
+#+BEGIN_SRC ruby
+@state = :closed
+#+END_SRC
+- In dealing with objects from the get go, we avoid "this hell" (OJSAP 3)(where at any given time you don't know what this means).  Unlike in Javascript you always
+  know what self means.  Context and and where to put data naturally reveals itself.
+- Intention becomes clearer, if open, close it, and vice versa
+
+Moving forward, lets implement the open() and close() methods invoked
+from the click handler. The actual mechanics of these methods are
+largely a straight translation of the Javascript, but grouped into 2
+methods.  We also pull the animation part from the Javascript
+sidebar() function into these methods. This makes for more cohesive code.
+
+
+#+BEGIN_SRC ruby
+  def open
+    icon = Element.find("#{element_id} i")
+    icon.add_class('glyphicon-chevron-left')
+    icon.remove_class('glyphicon-chevron-right')
+    Element.find('#sidebar').animate left: 20
+    @state = :open
+  end
+
+  def close
+    icon = Element.find("#{element_id} i")
+    icon.remove_class('glyphicon-chevron-left')
+    icon.add_class('glyphicon-chevron-right')
+    Element.find('#sidebar').animate left: -180
+    @state = :close
+  end
+
+#+END_SRC
+
+
+*** DUPLICATION!
+
+Some may say "Duplication is the root of all Code Evil" and they may
+be right.  We will apply the classic refactoring technique where you
+make 2 methods the same before refactoring to one.  Since the bulk of
+the Refactoring and Design Patterns were written in the context of
+Object Oriented languages, it is easy to remember and apply years of
+OO knowledge liberally - a perk of ROMYBCB #1
+
+
+We'll start with refactoring out the icon switching behavior
+
+#+BEGIN_SRC ruby
+  def open
+    set_icon('glyphicon-chevron-left', 'glyphicon-chevron-right')
+    Element.find('#sidebar').animate left: 20
+    @state = :open
+  end
+
+  def set_icon(class_to_add, class_to_remove)
+    icon = Element.find("#{element_id} i")
+    icon.add_class(class_to_add)
+    icon.remove_class(class_to_remove)
+  end
+
+  def close
+    set_icon('glyphicon-chevron-right', 'glyphicon-chevron-left')
+    Element.find('#sidebar').animate left: -180
+    @state = :closed
+  end
+#+END_SRC
+
+So I pull out a set_icon() method and pass them parameters.  I think
+the method and parameter names are intention revealing.
+
+Moving along I also see another pattern - the animation, so let's refactor that out.
+
+#+BEGIN_SRC ruby
+  def open
+    set_icon('glyphicon-chevron-left', 'glyphicon-chevron-right', 20)
+    state = :open
+  end
+
+  def set_icon(class_to_add, class_to_remove, new_position)
+    icon = Element.find("#{element_id} i")
+    icon.add_class(class_to_add)
+    icon.remove_class(class_to_remove)
+    Element.find('#sidebar').animate left: new_position
+  end
+
+
+  def close
+    set_icon('glyphicon-chevron-right', 'glyphicon-chevron-left', -180)
+    state = :closed
+  end
+#+END_SRC
+
+
+There's another pattern- the state change, so we move that functionality into set_icon
+#+BEGIN_SRC ruby
+  def open
+    set_icon('glyphicon-chevron-left', 'glyphicon-chevron-right', 20, :open)
+  end
+
+  def set_icon(class_to_add, class_to_remove, new_position, new_state)
+    icon = Element.find("#{element_id} i")
+    icon.add_class(class_to_add)
+    icon.remove_class(class_to_remove)
+    Element.find('#sidebar').animate left: new_position
+    @state = new_state
+  end
+
+  def close
+    set_icon('glyphicon-chevron-right', 'glyphicon-chevron-left', -180, :closed)
+  end
+#+END_SRC
+
+But now I've moved the code, I don't like the name set_icon anymore,
+the original intent is gone.  What shoud I call it? I have a practice,
+let's call it "Chang's Mom", where I try to name things so my mother
+could understand what was going on.  Similarly, it's my belief that
+good Ruby code when read aloud, tends to be very understandable. We're
+setting a new state so
+
+#+BEGIN_SRC ruby
+   def open
+    new_state('glyphicon-chevron-left', 'glyphicon-chevron-right', 20, :open)
+  end
+
+  def new_state(class_to_add, class_to_remove, new_position, new_state)
+    icon = Element.find("#{element_id} i")
+    icon.add_class(class_to_add)
+    icon.remove_class(class_to_remove)
+    Element.find('#sidebar').animate left: new_position
+    @state = new_state
+  end
+
+  def close
+    new_state('glyphicon-chevron-right', 'glyphicon-chevron-left', -180, :closed)
+  end
+#+END_SRC
+
+So now we have working Opal code that does everything the original javascript did.
+
+#+BEGIN_SRC ruby
+# Sidebar abstraction
+class Sidebar
+  attr_reader :element_id
+  def initialize(element_id, side)
+    @element_id = element_id
+    @state = :closed
+    Element.find("#{element_id} .toggles").on :click do
+      if @state  == :open
+        close
+      else
+        open
+      end
+    end
+  end
+
+  def open
+    new_state('glyphicon-chevron-left', 'glyphicon-chevron-right', 20, :open)
+  end
+
+  def new_state(class_to_add, class_to_remove, new_position, new_state)
+    icon = Element.find("#{element_id} i")
+    icon.add_class(class_to_add)
+    icon.remove_class(class_to_remove)
+    Element.find("#{element_id}").animate left: new_position
+    @state = new_state
+  end
+
+  def close
+    new_state('glyphicon-chevron-right', 'glyphicon-chevron-left', -180, :closed)
+  end
+
+end
+
+Document.ready? {
+  left_sidebar = Sidebar.new('#sidebar', 'left')
+}
+
+#+END_SRC
+
+I find the code to be
+- Easier to read - the intents are more clear
+- More cohesive
+- I even have new functionality I didn't have with the Javascript
+  code, I can now open and close the sidebar from other code
+
+So I have better code, more functionality, and it's about the same
+lines of code as the original. This makes me happy! Happiness is of
+the major driving reasons I like to do browser code in Opal.
+
+
+** The right sidebar
+
+We're not done yet, I also want to have a right sidebar too. Something I'd instantiate like this:
+
+#+BEGIN_SRC ruby
+Document.ready? {
+  left_sidebar = Sidebar.new('#sidebar', 'left)
+  right_sidebar = Sidebar.new('#sidebar-right', 'right)
+}
+#+END_SRC
+
+Here's the evil cut and pasted code I hastily put together when prototyping the right sidebar.
+
+
+#+BEGIN_SRC javascript
+  $.asm2 = {};
+  $.asm2.panels = 1;
+
+  function sidebar2(panels) {
+      $.asm2.panels = panels;
+      if (panels === 1) {
+          $('#sidebar-right').animate({
+              right: -780,
+          });
+      } else if (panels === 2) {
+          $('#sidebar-right').animate({
+              right: 20,
+          });
+          $('#sidebar-right').height($(window).height() - 50);
+      }
+  };
+
+
+  $(function() {
+      $('#toggleSidebar-right').click(function() {
+          if ($.asm2.panels === 1) {
+              $('#toggleSidebar-right i').removeClass('glyphicon-chevron-left');
+              $('#toggleSidebar-right i').addClass('glyphicon-chevron-right');
+              return sidebar2(2);
+          } else {
+              $('#toggleSidebar-right i').addClass('glyphicon-chevron-left');
+              $('#toggleSidebar-right i').removeClass('glyphicon-chevron-right');
+              return sidebar2(1);
+          }
+      });
+
+  });
+#+END_SRC
+
+Comparing with the original left sidebard code, I see that it's
+basically the same code but with different DOM element ids, CSS
+classes, offsets.  Instead of translating this, we can refactor the
+Sidebar class use the side parameter to set these state. In true refactoring
+fashion, we will not change the behavior of, but improve the structure
+so we target getting the original left to work
+
+In our Opal code thus far, we don't do anything with the side
+parameter.  Before now, we didn't need to.  Invoking "Chang's Mom" I
+prefactor and call the method set_params_for_side add the below call
+to the intialize method
+
+#+BEGIN_SRC ruby
+    set_params_for_side(side)
+#+END_SRC
+
+So let's fill in that method so that it works for the left sidebar.
+- Set instance variables if side is left
+- Use attr_reader to access those attributes via methods, to avoid any
+  possibly typos i.e. (@mispelled_instance_variable always == nil and
+  won't raise and Error)
+- Replace the calls in open()/close() to use those attribute
+  readers. A bonus is now those lines reveal even more intent than before
+
+#+BEGIN_SRC ruby
+  attr_reader :closed_icon_class, :opened_icon_class, :opened_x_position, :closed_x_position
+  def set_params_for_side(side)
+    if side == :left
+      @closed_icon_class = 'glyphicon-chevron-right'
+      @opened_icon_class = 'glyphicon-chevron-left'
+      @opened_x_position = 20
+      @closed_x_position = -180
+    end
+  end
+
+  def open
+    new_state(opened_icon_class, closed_icon_class, opened_x_position, :open)
+  end
+
+  def new_state(class_to_add, class_to_remove, new_position, new_state)
+    icon = Element.find("#{element_id} i")
+    icon.add_class(class_to_add)
+    icon.remove_class(class_to_remove)
+    Element.find("#{element_id}").animate left: new_position
+    @state = new_state
+  end
+
+  def close
+    new_state(closed_icon_class, opened_icon_class, closed_x_position, :closed)
+  end
+#+END_SRC
+
+So now let's handle the case when the parameter is :right.  Looking at
+the code I notice that I can't just change the fields, because the
+animation flies in from the other side.  So we need to support
+configuring what side we come in from.  That's easy enough, we just a
+new attribute x_position_side and set that
+
+#+BEGIN_SRC ruby
+  attr_reader :closed_icon_class, :opened_icon_class,
+              :opened_x_position, :closed_x_position,
+              :x_position_side
+  def set_params_for_side(side)
+    if side == :left
+      @closed_icon_class = 'glyphicon-chevron-right'
+      @opened_icon_class = 'glyphicon-chevron-left'
+      @opened_x_position = 20
+      @closed_x_position = -180
+      @x_position_side = 'left'
+    else
+      @closed_icon_class = 'glyphicon-chevron-left'
+      @opened_icon_class = 'glyphicon-chevron-right'
+      @opened_x_position = 20
+      @closed_x_position = -780
+      @x_position_side = 'right'
+    end
+  end
+
+  def open
+    new_state(opened_icon_class, closed_icon_class, opened_x_position, :open)
+  end
+
+  def new_state(class_to_add, class_to_remove, new_position, new_state)
+    icon = Element.find("#{element_id} i")
+    icon.add_class(class_to_add)
+    icon.remove_class(class_to_remove)
+    Element.find("#{element_id}").animate x_position_side => new_position
+    @state = new_state
+  end
+#+END_SRC
+
+Now I can instantiate the right sidebar with a single line. I will also be able to invoke right_sidebar.open for the next step of interface.
+
+Happiness ensues.  A good time was had by all
+
+The is "Done for now" code.  I will no doubt extend and improve it over time
+
+#+BEGIN_SRC ruby
+# Sidebar abstraction
+class Sidebar
+  attr_reader :element_id
+  def initialize(element_id, side)
+    @element_id = element_id
+    @state = :closed
+    set_params_for_side(side)
+    Element.find("#{element_id} .toggles").on :click do
+      if @state  == :open
+        close
+      else
+        open
+      end
+    end
+  end
+
+  attr_reader :closed_icon_class, :opened_icon_class,
+              :opened_x_position, :closed_x_position,
+              :x_position_side
+  def set_params_for_side(side)
+    if side == :left
+      @closed_icon_class = 'glyphicon-chevron-right'
+      @opened_icon_class = 'glyphicon-chevron-left'
+      @opened_x_position = 20
+      @closed_x_position = -180
+      @x_position_side = 'left'
+    else
+      @closed_icon_class = 'glyphicon-chevron-left'
+      @opened_icon_class = 'glyphicon-chevron-right'
+      @opened_x_position = 20
+      @closed_x_position = -780
+      @x_position_side = 'right'
+    end
+  end
+
+  def open
+    new_state(opened_icon_class, closed_icon_class, opened_x_position, :open)
+  end
+
+  def new_state(class_to_add, class_to_remove, new_position, new_state)
+    icon = Element.find("#{element_id} i")
+    icon.add_class(class_to_add)
+    icon.remove_class(class_to_remove)
+    Element.find("#{element_id}").animate x_position_side => new_position
+    @state = new_state
+  end
+
+  def close
+    new_state(closed_icon_class, opened_icon_class, closed_x_position, :closed)
+  end
+
+end
+
+Document.ready? {
+  left_sidebar = Sidebar.new('#sidebar', 'left')
+  right_sidebar = Sidebar.new('#sidebar-right', 'right')
+}
+#+END_SRC
+
+Please compare it with the original monkeyed with jsfiddle code at the
+top of this article.  I think we can agree the code is improved
