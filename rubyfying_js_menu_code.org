@@ -495,8 +495,8 @@ So let's fill in that method so that it works for the left sidebar.
 
 So now let's handle the case when the parameter is :right.  Looking at
 the code, I notice that I can't just change the fields, because the
-animation flies in from the other side.  So we need to support
-configuring what side we come in from.  That's easy enough, we just a
+animation flies in from the other side.  So we need to respond
+to what side we come in from.  That's easy enough, we just a
 new attribute x_position_side and set that
 
 #+BEGIN_SRC ruby
@@ -532,9 +532,10 @@ new attribute x_position_side and set that
   end
 #+END_SRC
 
-Now I can instantiate the right sidebar with a single line. I will also be able to invoke right_sidebar.open for the next step of interface.
+Now I can instantiate the right sidebar with a single line. I will also be able to invoke right_sidebar.open for
+the next step of the interface.
 
-Happiness ensues.  A good time was had by all
+Happiness ensues.  A good time is had by all
 
 The is "Done for now" code.  I will no doubt extend and improve it over time
 
@@ -598,5 +599,5 @@ Document.ready? {
 }
 #+END_SRC
 
-Please compare it with the original monkeyed with jsfiddle code at the
+Please compare it with the original monkeyed-with jsfiddle code at the
 top of this article.  I think we can agree the code is improved
