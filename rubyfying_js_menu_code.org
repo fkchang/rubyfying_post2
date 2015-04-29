@@ -17,8 +17,8 @@ http://jsfiddle.net/dmyTR/37/
 I took the initial code and adapted it to my needs. To check the
 viability of a right sidebar, I initially copied the code and modified
 it to make it run.  Now that the concept was proven, it was time to fix the
-code. Rather than refactoring the Javascript first, I would convert it
-to Opal. This was a place I knew that Opal would excel.
+code. /Rather than refactoring the Javascript first, I would convert it
+to Opal./ This was a place I knew that Opal would excel.
 
 * Starting code
 Let's look at the modified jsfiddle code in it's cut and pasted (anti) glory:
