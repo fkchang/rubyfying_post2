@@ -57,7 +57,7 @@ Some Key Points:
     - Avoid having to switch your mental context between Ruby and Javascript.
     - Use same tools: favorite editor/IDE, guard, rspec etc.
       - We use [[https://github.com/fkchang/opal-irb][opal-irb]] which (sort of) mimicks using the Rails console,
-        including accessing live Ruby objects at run-time.
+        including accessing live Ruby objects during run-time.
   - The ability to reuse server-side complex business logic code on
     the front end was a driving factor on our team choosing Opal.
     Despite my being an Opal advocate, the team suggested Opal on
