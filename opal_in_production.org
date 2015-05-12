@@ -102,4 +102,8 @@ that Opal has brought us.
 
 * Footnotes
 
-[fn:1]
+[fn:1] The Rails practice of automatically assigning the "requires"
+needed by Ruby files doesn't always assign the correct files where the
+"client-side" Ruby files are concerned.  How is the "sprockets"
+functionality able to know?  Until these conventions are worked out,
+we've found that it's easier (less debugging) to manually place the requires statements.
