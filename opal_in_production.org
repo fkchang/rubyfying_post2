@@ -83,10 +83,11 @@ Some Key Points:
     rarely see a require statement in a Rails app.  Since Opal uses
     sprockets to load assets, one CAN setup a situation where you
     wouldn't need to require things.  We did encounter load problems,
-    which in part are due to loading specs in browser that were
-    troublesome.  Instead we fell back [fn:1] to using explicit requires in our Opal
-    code, which solved that problem, and also fits in with the "less
-    magic" themes that are more prevalent these days.
+    which in part are due to loading in browser specs, that were
+    troublesome.  Instead we fell back [fn:1] to using explicit
+    requires in our Opal code, which solved that problem, and also
+    fits in with the "be explicit less magic" [fn:2] themes that are more prevalent these
+    days.
 - TL;DR: Ruby is Joy.  If you love Ruby on the back end, chances are high you'll
   love it on the front end.
   - The code is cleaner, clearer and more maintainable than if we had done it in Javascript.
@@ -102,8 +103,22 @@ that Opal has brought us.
 
 * Footnotes
 
-[fn:1] The Rails practice of automatically assigning the "requires"
-needed by Ruby files doesn't always assign the correct files where the
-"client-side" Ruby files are concerned.  How is the "sprockets"
-functionality able to know?  Until these conventions are worked out,
-we've found that it's easier (less debugging) to manually place the requires statements.
+[fn:1] In this effort, we were unable to duplicate the generally
+seemless behavior that the Rails autoloader does so well on the back
+end on the frontend.  Opal uses sprockets to manage dependencies and
+we had some issues with loading order and using sprockets directives
+in the standard application.js manifest.  We ultimately took a path of
+having an opal_requires.js.rb that served as a an "Opal requires
+manifest" that solved our issues.  It is complicated situation that
+ought to improve over time, both within Opal and related libraries
+(Opal 0.8.0 for example has an improved and upgraded sprockets
+implementation), and best practices
+
+[fn:2] In my spike, I favored explicit requires where the shared
+client/server code direction was not included in the load path to make
+it explicit where the code lived, i.e.
+
+#+BEGIN_SRC ruby
+require 'frontend_only_code'
+require 'client_and_server/code_shared_front_and_backend'
+#+END_SRC
