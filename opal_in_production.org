@@ -1,32 +1,34 @@
 One thing I believe thats hinders [[http://opalrb.org][Opal's]] adoption is that people are
 unsure whether Opal is "ready for production." On May 8, 2015, we
 deployed an Opal (and Rails) app to production.  While I've done a
-fair amount of work with Opal in the last few years, open source, side
-projects, internal tools (one of which could become a public facing
-tool), it was only on May 8th that I joined the ranks of those having
-a production site using Opal.
+fair amount of work with Opal in the last few years: open source, side
+projects, and internal tools,
+it was only on May 8th that I joined the ranks of those having
+deployed a production site using Opal.
 
 This project was quite successful across the board. While I largely
 attribute the success to our (Agile) process, the technical decision
 to use Opal played a significant role in that success.  I hope the
-below key points are able to give people on the fence about adopting
-Opal a nudge forward.
+remainder of this article can persuade people on the fence about adopting
+Opal to try it.
 
 
 Some Key Points:
 
 - Lots of tests! This is our first app (out of 8 apps in 6 years) with
-  extensive frontend tests. Technically "specs" as we use rspec on
-  both front and backend).
-  - Our other apps are not super involved in the front end.  As such,
-    they have relatively small amounts of browser-side code. As a result, vanilla
+  extensive front-end tests.  These are written in RSpec since RSpec
+  has been our testing language on the back-end.  We've been able to share some
+  of those tests on the front-end.
+  - Our other apps don't have much Javascript functionality in the front end.
+    As a result, vanilla
     Rails has generally served the client-side requirement of these apps quite well.
     Historically, we have tried repeatedly to supply comprehensive Javascript
-    tests, going all the way back with [[http://thinkrelevance.com/blog/2009/05/12/blue-ridge-1-0-javascript-unit-testing-for-rails-scandalous][blueridge]] and then
-    newer approaches.  Keeping test  momentum
-    going was hard, but since these apps didn't have much front-end functionality,
-    we could live with the unsatisfactory results.
-  - All that changed with this app which has complex business rules
+    tests, going all the way back with [[http://thinkrelevance.com/blog/2009/05/12/blue-ridge-1-0-javascript-unit-testing-for-rails-scandalous][blueridge]] and subsequent
+    newer approaches such as Jasmine, etc.  It seems we always experienced
+    mixed success both implementing and maintaining the tests,
+    but since these apps didn't have much front-end functionality,
+    we could "live with it".
+  - All that changed with app which has complex business rules
     that have to run on both the
     server and client.  There is considerably more user
     interaction, and so testing was far more more critical to this
