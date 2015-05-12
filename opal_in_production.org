@@ -84,7 +84,7 @@ Some Key Points:
     sprockets to load assets, one CAN setup a situation where you
     wouldn't need to require things.  We did encounter load problems,
     which in part are due to loading specs in browser that were
-    troublesome.  Instead we fell back to using explicit requires in our Opal
+    troublesome.  Instead we fell back [fn:1] to using explicit requires in our Opal
     code, which solved that problem, and also fits in with the "less
     magic" themes that are more prevalent these days.
 - TL;DR: Ruby is Joy.  If you love Ruby on the back end, chances are high you'll
@@ -99,3 +99,7 @@ Some Key Points:
 Hopefully, this helps answer some questions for would-be Opal
 adopters.  We're happy with the improved productivity and coding enjoyment
 that Opal has brought us.
+
+* Footnotes
+
+[fn:1]
