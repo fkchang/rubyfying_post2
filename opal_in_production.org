@@ -49,8 +49,8 @@ Some Key Points:
   - Finally, the [[https://github.com/opal/opal-rspec#async-examples][async examples]] in [[https://github.com/opal/opal-rspec][opal-rspec]] do a great job of showing how
     to easily work around Ruby's more primitive asynchronous support.
 
-- "Isomorphic" - Running the same code on the front end as the back end, is good.
-  - It's as big a deal as the Meteor guys say it is, except with
+- "Isomorphic" - Running the same code on the front-end as the back-end is good.
+  - It's as big a deal as the Meteor guys say it is, except that
     Opal lets you use the better (bias noted!) Ruby programming language.
     Some benefits are:
     - Reuse code on front/backend.
