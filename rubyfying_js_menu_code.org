@@ -2,26 +2,26 @@
 Rubyfying Javascript:  Avoiding jQuery Spaghetti
 
 * Intro
-One of the joys of Opal is how it produces better code.  Opal
-accomplishes this in large part by addressing a number of Opal JavaScript
-Anti-patterns, henceforth OJSAPs. In this episode we examine a real
-life example of how it addresses an OJSAP I'll call "jQuery spaghetti."
+One of the joys of Opal is how it produces, better code.  Opal
+accomplishes this in large part by addressing a number Opal JavaScript
+Anti Patterns, henceforth OJSAPs. In this episode we examine a real
+life example of how it addresses OJSAP I call "jQuery spaghetti."
 
 * Desired Result
 
 My app had the need for a slide out sidebar -- 2 sidebars, in fact.
 Some googling yielded a jsfiddle which demonstrated the sidebar effect I
-wanted with a minimum of html, css, and js:
+wanted with a minimum of html, css, and js.
 http://jsfiddle.net/dmyTR/37/
 
 I took the initial code and adapted it to my needs. To check the
 viability of a right sidebar, I initially copied the code and modified
-it to make it run.  Now that the concept was proven, it was time to fix the
-code. /Rather than refactoring the Javascript first, I would convert it
-to Opal./ This was a place I knew that Opal would excel.
+it to make on.  Now that I proved the concept, it was time to fix the
+code. Rather than refactoring the Javascript 1st, I would convert it
+to Opal in this stage. This was a place I knew that Opal would shine.
 
 * Starting code
-Let's look at the modified jsfiddle code in it's cut and pasted (anti) glory:
+Let's look at the modified jsfiddle code in it's cut and pasted (anti) glory.
 #+BEGIN_SRC javascript
   $.asm = {};
   $.asm.panels = 1;
@@ -89,13 +89,13 @@ Let's look at the modified jsfiddle code in it's cut and pasted (anti) glory:
   });
 #+END_SRC
 
-* So yes, this is ugly code.  This is
-no fault of the author; it's a quick and dirty code jsfiddle thrown together to answer a
-stackoverflow question. Unfortunately,
-this sort of code often ends up being production code. Since I wanted to
-prototype a particular interface, I shamelessly cut and pasted the
+* So yes, this is ugly code
+No fault of the author, it is a jsfiddle thrown together to answer a
+stackoverflow question, so it's quick and dirty code.  Unfortunately,
+this sort of code often ends up being production code. So that I could
+protopye a particular interface, I shamelessly cut and pasted the
 original until I could prove viability of my idea. Once I knew the interface
-could work, it was time to convert and refactor the code.
+could work, it was convert and refactor the code.
 
 * So what's the 1st step?
 
@@ -111,34 +111,36 @@ Document.ready? {
   }
 #+END_SRC
 
-Just 3 lines in I realized I didn't want to go down that path.  It just didn't
+Just 3 lines in I realized I didn't want to go that.  It just didn't
 feel right (didn't feel right), what's my intent?
 
 ** Begin with the end in mind - Steven Covey
-
-For fear of getting lost in the details, I aborted doing a line by line
-translation.  Instead I started with an interace that I would
+For fear of getting lost in the details, I aborted a line by line
+translation would not end up with the.  I started with an interace that I would
 want to use and reuse.
 
 ** Reasons Opal/Ruby makes your browser code better (ROMYBCB) #1 - Think in objects
 
-When coding in Ruby, I always think in terms of objects - Object
+Taking a Ruby mindset, I always think in terms of objects - Object
 Oriented programming is basically the Ruby Way.  It's easy, the
-example code is written this way, etc.  While you can can do OO
+example code are written this way, etc.  While you can can do OO
 programming in Javascript, things aren't typically as easy, and it's not
 universally encouraged.
 
-My intent is that I want this object to be easily manipulated elsewhere, something like this:
+intent. I want this object to be easily manipulated elsewhere, also
+showing my intent.  Something like this:
 
 #+BEGIN_SRC ruby
+  # Create w/intent
   left_sidebar = Sidebar.new('#toggleSidebar', 'left')
+  # elsewhere manipulate
   left_sidebar.hide
 #+END_SRC
 
 With this as the desired interface, we see that we have a Sidebar, so
-let's start building it.  The major part of the original code is in the
-click handler which allows the sidebar to slide in and out. Let's
-start with that:
+lets start building it.  The major part of the original code is in the
+click handler which allows the sidebar to slide in and out. Lets'
+start with that.
 
 #+BEGIN_SRC javascript
   // original code
@@ -173,8 +175,7 @@ Spaghetti and other JS antipatterns I'm trying to get away from.
     - Make a class and storing it as instance variable? That's just is just too much boiler plate code in Javascript...
   - What happens when we need more than 1 set of state? In my case, I want 2 sidebars, so the "global" needs to be duplicated
 - Magic numbers $.asm.panels === 1 $.asm.panels === 2 -- which one is open, which is close. A little too "bad C"-like IMO
-- The spaghetti itself. DOM objects and CSS sprinkled in randomly.  What files might those be in?  Going a step further than
-  this post, lissio allows one to put all those concerns cohesively in 1 place
+- The spaghetti itself. DOM objects and css sprinkled in randomly.  What files might those be in?  Going a step further than this post, lissio allows one to put all those concerns cohesively in 1 place
 
 * The click handler
 
@@ -203,9 +204,7 @@ end
 I think that's pretty clear.  Already an improvement, IMO.
 
 Let's contrast coding this in Opal vs Javascript
-- In the original Javascript, he hung the example on $.asm.panels, possibly because it was a convenient place to
-  hand the data since the original code was not dealing with objects.  With Opal we have a natural place to place
-  the state: instance variables. On creation, we start off with the sidebar in a closed state
+- In the original Javascript, he hung the example on $.asm.panels, possibly because it was a convenient place to hand the data since the original code was not dealing with objects.  With opal we have a natural place to place the state - instance variables. On creation, we start off with the sidebar in a closed state
 #+BEGIN_SRC ruby
 @state = :closed
 #+END_SRC
@@ -213,11 +212,12 @@ Let's contrast coding this in Opal vs Javascript
   know what self means.  Context and and where to put data naturally reveals itself.
 - Intention becomes clearer, if open, close it, and vice versa
 
-Moving forward, the open() and close() methods are invoked
+Moving forward, lets implement the open() and close() methods invoked
 from the click handler. The actual mechanics of these methods are
 largely a straight translation of the Javascript, but grouped into 2
 methods.  We also pull the animation part from the Javascript
 sidebar() function into these methods. This makes for more cohesive code.
+
 
 #+BEGIN_SRC ruby
   def open
@@ -393,6 +393,7 @@ So I have better code, more functionality, and it's about the same
 lines of code as the original. This makes me happy! Happiness is of
 the major driving reasons I like to do browser code in Opal.
 
+
 ** The right sidebar
 
 We're not done yet, I also want to have a right sidebar too. Something I'd instantiate like this:
@@ -405,6 +406,7 @@ Document.ready? {
 #+END_SRC
 
 Here's the evil cut and pasted code I hastily put together when prototyping the right sidebar.
+
 
 #+BEGIN_SRC javascript
   $.asm2 = {};
@@ -494,9 +496,9 @@ So let's fill in that method so that it works for the left sidebar.
 #+END_SRC
 
 So now let's handle the case when the parameter is :right.  Looking at
-the code, I notice that I can't just change the fields, because the
-animation flies in from the other side.  So we need to respond
-to what side we come in from.  That's easy enough, we just a
+the code I notice that I can't just change the fields, because the
+animation flies in from the other side.  So we need to support
+configuring what side we come in from.  That's easy enough, we just a
 new attribute x_position_side and set that
 
 #+BEGIN_SRC ruby
@@ -532,10 +534,9 @@ new attribute x_position_side and set that
   end
 #+END_SRC
 
-Now I can instantiate the right sidebar with a single line. I will also be able to invoke right_sidebar.open for
-the next step of the interface.
+Now I can instantiate the right sidebar with a single line. I will also be able to invoke right_sidebar.open for the next step of interface.
 
-Happiness ensues.  A good time is had by all
+Happiness ensues.  A good time was had by all
 
 The is "Done for now" code.  I will no doubt extend and improve it over time
 
@@ -599,5 +600,5 @@ Document.ready? {
 }
 #+END_SRC
 
-Please compare it with the original monkeyed-with jsfiddle code at the
+Please compare it with the original monkeyed with jsfiddle code at the
 top of this article.  I think we can agree the code is improved
