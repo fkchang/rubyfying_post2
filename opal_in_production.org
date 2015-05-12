@@ -19,63 +19,73 @@ Some Key Points:
   extensive frontend tests. Technically "specs" as we use rspec on
   both front and backend).
   - Our other apps are not super involved in the front end.  As such,
-    they have relatively small amounts browser side code. Vanilla
-    Rails has served the nature of most of apps quite well in general.
-    We have tried several times to put in comprehensive Javascript
-    tests, 1st starting all the way backwith [[http://thinkrelevance.com/blog/2009/05/12/blue-ridge-1-0-javascript-unit-testing-for-rails-scandalous][blueridge]] and trying
-    newer approaches over time.  We had a hard time keeping momentum
-    going, but with the relative light front end needs, that was not
-    that much of an issue.
-  - This app has considerably more user interaction, to include
-    complex business rules that we would need to run both on front and
-    back end.  The need for specs became much more critical to this
+    they have relatively small amounts of browser-side code. As a result, vanilla
+    Rails has generally served the client-side requirement of these apps quite well.
+    Historically, we have tried repeatedly to supply comprehensive Javascript
+    tests, going all the way back with [[http://thinkrelevance.com/blog/2009/05/12/blue-ridge-1-0-javascript-unit-testing-for-rails-scandalous][blueridge]] and then
+    newer approaches.  Keeping test  momentum
+    going was hard, but since these apps didn't have much front-end functionality,
+    we could live with the unsatisfactory results.
+  - All that changed with this app which has complex business rules
+    that have to run on both the
+    server and client.  There is considerably more user
+    interaction, and so testing was far more more critical to this
     app's timely success.
-  - It's not that you can't do have comprehensive unit testing in
-    Javascript --- many teams succeed where we failed. However, Opal makes
-    things easier for testing Rubyists, facillitating the use the same
-    language, knowledge and test framework on front and back ends.
-    Personally, I'm have a much better TDD/BDD focus in Ruby, than
+  - It's not that you can't write comprehensive unit tests in
+    Javascript --- many teams have succeedfed where we failed. However, Opal
+    makes client-side testing much easier for Rubyists by using the same
+    language, knowledge and test framework on both ends.
+    Personally I have a much better TDD/BDD focus in Ruby than
     Javascript.
-  - A lot frameworks copy or are inspired by [[http://rspec.info][rSpec]].  Why use a copy
-    when you can use the original?  If you don't like
-    rSpec, [[https://github.com/skofo/opal-minitest][minitest]] is also available.
-  - [[https://github.com/opal/opal-rspec#async-examples][Async examples]] in [[https://github.com/opal/opal-rspec][opal-rspec]] sure are handy!
+  - Many frameworks copy or are inspired by [[http://rspec.info][RSpec]].  Having Opal lets
+    the Rubyist use the original instead of a Javascript derivative
+    For Rubyists that don't like RSpec (like DHH), [[https://github.com/skofo/opal-minitest][minitest]] is also available.
+  - For the code that implements the business rules, Ruby provides seamless
+    inheritance and mixins.  Although these are on the horizon for Javascript,
+    there will be a "break-in" period as the different browsers that need to
+    be supported come up to speed.
+  - Finally, the [[https://github.com/opal/opal-rspec#async-examples][async examples]] in [[https://github.com/opal/opal-rspec][opal-rspec]] do a great job of showing how
+    to easily work around Ruby's more primitive asynchronous support.
 
-- "Isomorphic" - Running the same code on front end as backend, is good.
-  - It's as big a deal as the Javascript guys say it is, except with
-    Opal get to use a better (bias noted), programming language,
-    i.e. Ruby.  Some benefits are:
+- "Isomorphic" - Running the same code on the front end as the back end, is good.
+  - It's as big a deal as the Meteor guys say it is, except with
+    Opal lets you use the better (bias noted!) Ruby programming language.
+    Some benefits are:
     - Reuse code on front/backend.
-    - Avoid having to switch mental context for front/backend programming languages
-    - Use same tools, favored editor/IDE, guard, rspec etc.
-      - We use used [[https://github.com/fkchang/opal-irb][opal-irb]] which parallels using the Rails console,
-        albeit with live objects at run-time.
-  - The ability to reuse server side complex business logic code on
+    - Avoid having to switch your mental context between Ruby and Javascript.
+    - Use same tools: favorite editor/IDE, guard, rspec etc.
+      - We use [[https://github.com/fkchang/opal-irb][opal-irb]] which (sort of) mimicks using the Rails console,
+        including accessing live Ruby objects at run-time.
+  - The ability to reuse server-side complex business logic code on
     the front end was a driving factor on our team choosing Opal.
-    Despite my being an Opal advocate, the team came suggested Opal on
-    their own, without any suggestion on my part. I did, however spike
+    Despite my being an Opal advocate, the team suggested Opal on
+    their own without any prompting on my part. I did spike
     what I thought was the most involved scenario as a proof of
-    concept. The team liked the way the code looked and went with it.
+    concept; the team liked the way the code looked and went with it.
     - OH: "That would've been really hard if we did it in Javascript"
       -- the team member who started the local Meteor.js meetup (as
       background for someone who isn't a Javascript newbie)
-- Conventions still need to be worked out.  All the production Opal
+- Challenges - conventions still need to be worked out.  All the production Opal
   apps I know of are closed source, so there's not a lot of code to
   look at, nor much written about it.
   - Where does the code live?  Rails already provides standard
-    locations for front end and backend code. So where do you put
-    shared code? We took a meteor-esque way of having a dedicated
-    directory where isomorphic code lives.  I will blog about our setup
+    locations for front end and backend code but where do you put
+    shared code? We took a "meteor-esque" way: provide a dedicated
+    directory where isomorphic code lives (expect future blog post that will
+    discuss details).
   - Explicit require vs auto load?  With the Rails autoloader, one may
     rarely see a require statement in a Rails app.  Since Opal uses
     sprockets to load assets, one can setup a situation where you
     wouldn't need to require things.  Instead we went with explicit
-    requires in our Opal code.
-- Ruby is Joy.  If you love Ruby on the backend, chances are high you'll
-  love Ruby on the front end.
+    requires in our Opal code. (Scott: this paragraph is confusing; why
+    would you put explicit requires in your Opal code if sprockets implies
+    you shouldn't have to.  Clarity needed.)
+- TL;DR: Ruby is Joy.  If you love Ruby on the back end, chances are high you'll
+  love it on the front end.
   - The code is cleaner, clearer and more maintainable than if we had done it in Javascript.
-  - Inheritance and modules work.  There's a reason so many people reimplement these in Javascript.
+  - Shared code on both ends.
+  - Inheritance and modules work.
 
 Hopefully, this helps answer some questions for would be Opal
-adopters.  Being more productive and happier has certainly been worth
-it for us.
+adopters.  We're happy with the improved productivity and coding enjoyment
+that Opal has brought us.
