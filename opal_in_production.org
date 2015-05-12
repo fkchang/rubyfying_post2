@@ -27,7 +27,8 @@ Some Key Points:
     mixed success both implementing and maintaining the tests,
     but since these apps didn't have much front-end functionality,
     we could "live with it".
-  - All that changed with app which has complex business rules
+  - All of that changed with the app we've just deployed.
+     This app has complex business rules
     that have to run on both the
     server and client.  There is considerably more user
     interaction, and so testing was far more more critical to this
