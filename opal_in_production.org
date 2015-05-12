@@ -1,8 +1,7 @@
 One thing I believe thats hinders [[http://opalrb.org][Opal's]] adoption is that people are
 unsure whether Opal is "ready for production." On May 8, 2015, we
 deployed an Opal (and Rails) app to production.  While I've done a
-fair amount of work with Opal in the last few years: open source, side
-projects, and internal tools,
+fair amount of work with Opal in the last few years,
 it was only on May 8th that I joined the ranks of those having
 deployed a production site using Opal.
 
