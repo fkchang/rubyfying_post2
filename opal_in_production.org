@@ -86,7 +86,7 @@ Some Key Points:
   love it on the front end.
   - The code is cleaner, clearer and more maintainable than if we had done it in Javascript.
   - Shared code on both ends.
-  - Inheritance and modules work.
+  - Inheritance and modules work right now; no waiting for ES6.
 
 Hopefully, this helps answer some questions for would be Opal
 adopters.  We're happy with the improved productivity and coding enjoyment
