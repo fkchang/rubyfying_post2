@@ -109,10 +109,10 @@ end on the frontend.  Opal uses sprockets to manage dependencies and
 we had some issues with loading order and using sprockets directives
 in the standard application.js manifest.  We ultimately took a path of
 having an opal_requires.js.rb that served as a an "Opal requires
-manifest" that solved our issues.  It is complicated situation that
+manifest" that solved our issues.  It is a complicated situation that
 ought to improve over time, both within Opal and related libraries
 (Opal 0.8.0 for example has an improved and upgraded sprockets
-implementation), and best practices
+implementation), and best practices.
 
 [fn:2] In my spike, I favored explicit requires where the shared
 client/server code direction was not included in the load path to make

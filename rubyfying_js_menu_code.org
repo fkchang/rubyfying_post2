@@ -400,7 +400,7 @@ We're not done yet, I also want to have a right sidebar too. Something I'd insta
 
 #+BEGIN_SRC ruby
 Document.ready? {
-  left_sidebar = Sidebar.new('#sidebar', 'left)
+  left_sidebar = Sidebar.new('#sidebar', 'left')
   right_sidebar = Sidebar.new('#sidebar-right', 'right)
 }
 #+END_SRC
