@@ -1,0 +1,127 @@
+So you've decided to take the plunge and try Opal, the 1st question
+you might have is, "Do I lose access to all the javascript libraries
+out there?" The answer is no.  Ideally you'll want a Ruby wrapper that
+ruby-fies it, it'll make you happier, but that's not always available.
+A great example is of a Ruby-fied wrapper is [[https://github.com/opal/opal-jquery][opal-jquery]] (examples)
+
+* Calling Javascript Directly
+To invoke JS and store the output in Opal, use x-strings, either via the backtick
+operator or the %x syntax.  Some documentation here: http://opalrb.org/docs/compiled_ruby/#javascript-from-ruby
+
+#+BEGIN_SRC ruby
+# backticks, good for 1 line
+location = `window.location`
+
+# %x for multi line
+%x|
+  var f = new Foo();
+  f.bar
+|
+#+END_SRC
+
+* Interpolation
+
+Just as x-strings supports interpolation in Ruby, x-strings supports interpolation in Opal as well
+
+#+BEGIN_SRC ruby
+ # it should be noted that prompt is already exposed in opal-browser
+ `prompt('what have you done since  ' + #{RUBY_RELEASE_DATE})`
+#+END_SRC
+
+* Simple return values
+But what about the return value?  x-strings return the native types
+
+In Opal, 3 types get compiled to the native Javascript types.  These types are
+- Strings
+- Numeric
+- Array
+
+These types are usuable directly in opal as Ruby objects.  See http://opalrb.org/docs/compiled_ruby/ for more details on what Opal compiles to.
+
+#+BEGIN_SRC ruby
+# numbers
+n = `2 + 2`
+triple product = n * 3 # => 12
+
+# strings
+str = 'abcdef'
+str[3..-1]             # => 'def'
+
+# array
+array = `[1, 2, 3]`
+array.size             # => 3
+
+#+END_SRC
+
+In addition, true, false, and null map to true, false, and nil
+respectively, so javascript that evaluates these values can be used
+directly in opal.
+
+* Manipulating JS objects
+
+Manipulating native javascript objects is a little more cumbersome.
+Because of how opal is compiled you cannot access( This however changes soon [fn:JS]
+
+#+BEGIN_SRC ruby
+w = `window`
+location = `#{w}.location`
+href = `#{location}.href`
+#+END_SRC
+
+
+
+* Native - Making life easier
+You can use Kernel#Native() to wrap a native object for more convenient access in Opal.
+
+#+BEGIN_SRC ruby
+
+obj = Native(`returnSomeObj()`) # you still need x-strings to get a JS object into opal
+obj[:property]                  # property reader
+obj[:property] = 'new value'    # property reader
+obj.method
+#+END_SRC
+
+What Native() does in a nutshell is create a Ruby/Opal object with a
+@native instance variable.  It uses method_missing() to call native
+methods on @native, and [] and []= for reading/setting properties
+
+Let's revisit of href example using Native()
+
+#+BEGIN_SRC ruby
+w = Native(`window`)
+location = w.location
+href = location.href
+#+END_SRC
+
+It's worth noting that Native() works where methods will resolve themselve as properties if thats what they are
+
+#+BEGIN_SRC ruby
+w = Native(`window`) # => #<Native:[object Window]>
+w[:location]         # => #<Native:http://fkchang.github.io/opal-irb/index-embeddable.html>
+w.location           # => #<Native:http://fkchang.github.io/opal-irb/index-embeddable.html>
+#+END_SRC
+
+* Conclusion
+These are your options.  I'll cover Wrapping Javascript in Opal classes in a future issue.
+Enjoy!
+
+[fn:JS] This recently merged [[https://github.com/opal/opal/pull/879][PR]] from [[https://github.com/jeremyevans][Jeremy Evans]] into master
+supports a much handier way to access javascript functions and
+properties than using x-stings.  With a native object, you can use
+object.JS to get at the javascript.  This functionality will most
+likely NOT go into 0.8, but some future version, possibly 0.9. Examples:
+#+BEGIN_SRC ruby
+o = `returnAnObject()`
+# access properties like this
+o.JS[:property]
+# access functions like this
+o.JS.javascriptMethod(1, 2)
+
+#+END_SRC
+
+Let's look at the href example I've been using with this syntax
+#+BEGIN_SRC ruby
+w = `window`
+location = w.JS[:location]
+href = location.JS[:href]
+#+END_SRC
