@@ -1,15 +1,15 @@
 #+OPTIONS: num:nil toc:nil
 
-So if you've decided to take the plunge and try Opal, the 1st question
-you might have is, "Do I lose access to all the JavaScript libraries
-out there?" The answer is no.  Ideally you'll want Ruby wrappers that
+So if you've decided to take the plunge and try *Opal*, the 1st question
+you might have is, "Do I lose access to all the *JavaScript* libraries
+out there?" The answer is no.  Ideally you'll want *Ruby* wrappers that
 "ruby-fy" the  JavaScript in question.  It'll make you happier but that's not
 always available.  A great example of a Ruby-fied wrapper is
 [[https://github.com/opal/opal-jquery][opal-jquery]]; this shows how the jQuery interface can be made more Ruby like.
 
 * Calling JavaScript Directly
-To invoke JavaScript and store the return value in Opal, use x-strings,
-either via the backtick operator or the %x syntax.  Some documentation
+To invoke JavaScript and store the return value in Opal, use *x-strings*,
+either via the *backtick* operator or the *%x syntax*.  Some documentation
 here: http://opalrb.org/docs/compiled_ruby/#javascript-from-ruby
 
 #+BEGIN_SRC ruby
@@ -24,8 +24,7 @@ location = `window.location`
 #+END_SRCP
 * Interpolation
 
-Just as x-strings in Ruby support interpolation, x-strings in Opal also support
-interpolation:
+*Opal* uses *x-strings* to support /interpolation/ just as *Ruby* does:
 
 #+BEGIN_SRC ruby
  # it should be noted that prompt is already exposed in opal-browser
@@ -81,13 +80,13 @@ href = `#{location}.href`
 
 * Native - Making life easier
 That's pretty cumbersome. Pretty un-Ruby-like if you ask me. In the
-Ruby way of making the developer happy, you can use Kernel#Native() to
+Ruby way of making the developer happy, you can use ~Kernel#Native()~ to
 wrap a native object for more convenient access in Opal.
 
 Ruby implements the [[http://en.wikipedia.org/wiki/Uniform_access_principle][*Uniform Access Principle*]]. As such, you can't
-access the equivalent of properties on Ruby objects all access is via
-methods even if they look like properties due to parentheses being
-optional in Ruby. In JavaScript, the difference between properties and
+access the equivalent of properties on Ruby objects; rather all access is via
+methods even if they look like properties (due to parentheses being
+optional in Ruby). In JavaScript, the difference between properties and
 functions/methods is significant.  So how would you do the different
 accesses in Opal if everything is a method?
 
@@ -129,7 +128,7 @@ w.location           # => #<Native:http://fkchang.github.io/opal-irb/index-embed
 Writing wrapper classes is useful in making the interfaces to your Javascript code
 more Ruby-like.   Even without wrapper classes, you will find x-strings and ~Native()~ options useful.
 These Opal features can bring a lot of joy and productivity to the
-Ruby developer. I'll cover wrapping Javascript in Opal
+client-side Ruby developer. I'll cover wrapping Javascript in Opal
 classes in a future issue.
 
 Enjoy!
@@ -137,9 +136,9 @@ Enjoy!
 [fn:CompiledOpal]
 As indicated by
 http://opalrb.org/docs/compiled_ruby/#ruby-from-javascript, compiled
-Opal method names get a $ prepended to them to avoid conflict with
+Opal method names get a ~$~ prepended to them to avoid conflict with
 JavaScript methods.  As such running a method on a native object would
-compile to that method name prepended with a $, which would not exist on the object.
+compile to that method name prepended with a ~$~, which would not exist on the object.
 This [[http://opalrb.org/try/?code:w%2520%253D%2520%2560window%2560%250Aw.location][example]]  ought to make it a bit clearer
 
 
