@@ -112,7 +112,7 @@ obj.method2(1, 2)               # method call with parameters
 
 #+ATTR_HTML: :target "_blank" 
 To get a feel of accessing a property vs a method/function on a native object, play
-around w/this  [[http://fkchang.github.io/opal-irb/index-embeddable.html#code:w%20%3D%20Native(%60window%60)%0Aw.prompt%20%20%20%23%20calls%20method%2C%20pops%20up%20empty%20prompt%0Aw%5B%3Aprompt%5D%20%23%20give%20you%20back%20the%20function%20that%20is%20in%20the%20property][opal-irb example]] a bit
+around w/this  [[http://fkchang.github.io/opal-irb/index-embeddable.html#code:w%2520%253D%2520Native(%2560window%2560)%250Aw.prompt%2520%2520%2520%2523%2520calls%2520method%252C%2520pops%2520up%2520empty%2520prompt%250Aw%255B%253Aprompt%255D%2520%2523%2520give%2520you%2520back%2520the%2520function%2520that%2520is%2520in%2520the%2520property][opal-irb example]] a bit
 
 Let's revisit of href example using Native()
 
@@ -145,12 +145,13 @@ Enjoy!
 
 [fn:CompiledOpal]
 #+ATTR_HTML: :target "_blank" 
+#+ATTR_HTML: :target "_blank" 
 As indicated by
 http://opalrb.org/docs/compiled_ruby/#ruby-from-javascript, compiled
 Opal method names get a $ prepended to them to avoid conflict with
 JavaScript methods.  As such running a method on a native object would
 compile to that method name prepended with a $, which would not exist on the object.
-This [[http://opalrb.org/try/?code:w%20%3D%20%60window%60%0Aw.location][example]]  ought to make it a bit clearer  
+This [[http://opalrb.org/try/?code:w%2520%253D%2520%2560window%2560%250Aw.location][example]]  ought to make it a bit clearer  
 
 
 [fn:JS]
