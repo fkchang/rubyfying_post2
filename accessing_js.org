@@ -21,7 +21,7 @@ location = `window.location`
   var f = new Foo();
   f.bar
 |
-#+END_SRCP
+#+END_SRC
 * Interpolation
 
 *Opal* uses *x-strings* to support /interpolation/ just as *Ruby* does:
