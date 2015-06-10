@@ -1,5 +1,6 @@
 #+OPTIONS: num:nil toc:nil
 
+#+ATTR_HTML: :target "_blank"
 So if you've decided to take the plunge and try *Opal*, the 1st question
 you might have is, "Do I lose access to all the *JavaScript* libraries
 out there?" The answer is no.  Ideally you'll want *Ruby* wrappers that
@@ -42,6 +43,7 @@ treated as Ruby objects by Opal.  These types are
 - Numeric
 - Array
 
+#+ATTR_HTML: :target "_blank"
 See http://opalrb.org/docs/compiled_ruby/ for more
 details on what Opal compiles to.
 
@@ -83,6 +85,7 @@ That's pretty cumbersome. Pretty un-Ruby-like if you ask me. In the
 Ruby way of making the developer happy, you can use ~Kernel#Native()~ to
 wrap a native object for more convenient access in Opal.
 
+#+ATTR_HTML: :target "_blank"
 Ruby implements the [[http://en.wikipedia.org/wiki/Uniform_access_principle][*Uniform Access Principle*]]. As such, you can't
 access the equivalent of properties on Ruby objects; rather all access is via
 methods even if they look like properties (due to parentheses being
@@ -103,6 +106,7 @@ obj.method                      # method call without parameters
 obj.method2(1, 2)               # method call with parameters
 #+END_SRC
 
+#+ATTR_HTML: :target "_blank"
 To get a feel of accessing a property vs a method/function on a native object, play
 w/this  [[http://fkchang.github.io/opal-irb/index-embeddable.html#code:w%2520%253D%2520Native(%2560window%2560)%250Aw.prompt%2520%2520%2520%2523%2520calls%2520method%252C%2520pops%2520up%2520empty%2520prompt%250Aw%255B%253Aprompt%255D%2520%2523%2520give%2520you%2520back%2520the%2520function%2520that%2520is%2520in%2520the%2520property][opal-irb example]] a bit
 
@@ -134,6 +138,7 @@ classes in a future issue.
 Enjoy!
 
 [fn:CompiledOpal]
+#+ATTR_HTML: :target "_blank"
 As indicated by
 http://opalrb.org/docs/compiled_ruby/#ruby-from-javascript, compiled
 Opal method names get a ~$~ prepended to them to avoid conflict with
@@ -142,7 +147,9 @@ compile to that method name prepended with a ~$~, which would not exist on the o
 This [[http://opalrb.org/try/?code:w%2520%253D%2520%2560window%2560%250Aw.location][example]]  ought to make it a bit clearer
 
 
-[fn:JS] This recently merged [[https://github.com/opal/opal/pull/879][PR]] from [[https://github.com/jeremyevans][Jeremy Evans]] into master
+[fn:JS]
+#+ATTR_HTML: :target "_blank"
+This recently merged [[https://github.com/opal/opal/pull/879][PR]] from [[https://github.com/jeremyevans][Jeremy Evans]] into master
 supports a much handier way to access JavaScript functions and
 properties than using x-stings.  With a native object, you can use
 object.JS to get at the JavaScript.  This functionality will most
