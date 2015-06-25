@@ -108,8 +108,8 @@ the Principle of Least Surprise.
 
 * Blocks
 
-As is typical with Ruby, in Opal-jquery we make use of blocks where
-anonymous functions are typically used in jQuery, or JavaScript in
+As is typical with Ruby, in *Opal-jquery* we make use of blocks where
+anonymous functions are typically used in *jQuery*, or JavaScript in
 general.  The examples read well.
 
 #+BEGIN_SRC ruby
@@ -118,7 +118,7 @@ general.  The examples read well.
   element.on(:click) { |event| alert("#{evt.current_target} been clicked") } # event
 #+END_SRC
 
-I will note that you can pass lambdas, methods, etc. in place of a
+Note that you can pass lambdas, methods, etc. in place of a
 block, similar to how one would use a named function or function stored in a
 variable in JavaScript.
 
@@ -136,14 +136,13 @@ variable in JavaScript.
   element.on(:click) &instance_method
 #+END_SRC
 
-
 * Consistency with Native
 
 #+ATTR_HTML: :target "_blank"
-In [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I showed how attributes of Native
-are accessed by the [] and []= methods.  Element instances adhere to
+In [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I showed how attributes of =Native=
+are accessed by the =[]= and =[]\== methods.  =Element= instances adhere to
 this convention. - Consistency is good and helps support the
-Principle of Least Surprise.
+*Principle of Least Surprise*.
 
 #+BEGIN_SRC ruby
   native = Native(`returnsJsObject`)
@@ -156,14 +155,13 @@ Principle of Least Surprise.
 
 #+END_SRC
 
-
 * Conclusion
 
-Hopefully the Rubyist reader can see how wrapping jQuery is
-preferable.  The code reads well, expresses intent clearly, and uses
+For the Rubyist reader, there are advantages in wrapping *jQuery* in *Opal-JQuery*:
+the code reads well, expresses intent clearly, and uses
 conventions and idioms that a Rubyist should already be familiar with.
-Hopefully this brief overview gives you ideas on how one could wrap a
-JavaScript library w/idiomatic Ruby for similar benefits.  In a future
-articles, we will look at more of Ruby-fication of jQuery's API, as
-well as the technical specifics of jQuery was wrapped, giving you
-techniques to wrap other JavaScript libraries.
+Hopefully this brief overview gives you ideas on how one could wrap other
+JavaScript libraries w/idiomatic Ruby for similar benefits.  In a future
+article, we'll look at more "Ruby-fication" of jQuery's API as
+well as the "internals" of how jQuery was wrapped, giving you
+even more techniques to wrap other JavaScript libraries.
