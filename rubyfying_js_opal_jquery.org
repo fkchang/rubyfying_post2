@@ -170,3 +170,5 @@ future articles we will look at more examples of Ruby-fication of
 jQuery's API, as well as show you some techniques used to wrap jQuery
 so that you might be able to apply them to wrapping other JavaScript
 libraries.
+
+Thanks to [[http://blog.scottnelsonsmith.com][Scott Smith]] for proofreading this and a number of the previous Opal blog posts.
