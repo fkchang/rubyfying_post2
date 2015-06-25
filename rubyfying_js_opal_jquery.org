@@ -1,24 +1,23 @@
 #+OPTIONS: num:nil
 
 #+ATTR_HTML: :target "_blank"
-In my last post about [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I mentioned that
-it is preferable to wrap JavaScript libraries in Opal.  I feel the
-answers to "Why is it preferrable to wrap JavaScript in an idiomatic
-Ruby fashion?" are best shown by example.
+In my last post about [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I asserted ("argued" works here too) that
+it is preferable to wrap JavaScript libraries in *Opal*; the reasons
+why are best shown by example.
 
 #+ATTR_HTML: :target "_blank"
 Let's look at [[https://github.com/opal/opal-jquery][Opal-jquery]], one of the "official Opal libraries", as a
-source of examples good concrete examples. Opal-jquery wraps jQuery
-with an idiomatic Ruby frontend.  There are some differences from the
+source of good concrete examples. *Opal-jquery* wraps *jQuery*
+with an idiomatic *Ruby* frontend.  There are some differences from the
 original JavaScript API, but my opinion it that these changes are for
 the better.
 
 * Basic jQuery
 
-I call the jQuery/$ function "jQuery's universal entry point."  Nearly
-all uses of jQuery start from this function .  One of the primary uses
-of $ is as a selector for elements.  It is very typical to chain one
-or more actions directly off the selector, as shown below.
+I call the =jQuery/$= function "jQuery's universal entry point."  Nearly
+all uses of *jQuery* start from this function.  One of the primary uses
+of *$* is as a selector for elements.  It is very typical to chain one
+or more actions directly from the selector, as shown here:
 
 #+BEGIN_SRC javascript
   $('a').action()                                 // select by node type
@@ -28,10 +27,10 @@ or more actions directly off the selector, as shown below.
 
 Interestingly, this same "universal entry point" function is also how
 one sets up "Document ready" actions.  All of the various invocations
-below *can* be used to setup "Document ready" actions.
+below /can/ be used to setup "Document ready" actions.
 
 #+BEGIN_SRC javascript
-  $(document).ready(function() {alert('document is ready')});                      
+  $(document).ready(function() {alert('document is ready')});
   $('p').ready(function(){alert('fires whether or not there is p element')});
   $('never-matching_selector').ready(function(){alert('still fires')});
   $().ready(function() { alert('this works, but the doc says "not recommended"')});
@@ -40,9 +39,9 @@ below *can* be used to setup "Document ready" actions.
 * Ruby-fying Javascript - Object oriented basic jQuery
 
 Rather than having a function that is the universal entry point,
-opal-jquery assigns selector entry points to appropriate constants
-(classes/objects).  At the top level, we call these selectors off the
-constant themselves
+=opal-jquery= assigns selector entry points to appropriate constants
+(classes/objects).  At the top level, we call these selectors from the
+constants themselves.
 
 ** Selectors
 #+BEGIN_SRC ruby
@@ -51,17 +50,17 @@ constant themselves
   Element.id('mydiv')             # find by id
 #+END_SRC
 
-I like that find() is a consistent selector. It's can find from the
-top, and relative to an Element instance.
+I like that =find()= is a consistent selector. It can find from the
+top, and relative to an =Element= instance.
 
 #+BEGIN_SRC ruby
   mydiv = Element.find '#mydiv'
   h1_children_of_mydiv = mdiv.find 'h1'
 #+END_SRC
 
-Opal-jquery also implements a Ruby convention where the Element.[]
-method is used as a selector. This come in handy for those who miss
-the terseness of $.
+=Opal-jquery= also implements a Ruby convention where the =Element.[]=
+method is used as a selector. This comes in handy for those who miss
+the terseness of *$*.
 
 #+BEGIN_SRC ruby
   mydiv = Element['#mydiv']
@@ -69,21 +68,18 @@ the terseness of $.
   help_sections = Element['.help']
 #+END_SRC
 
-Opal-jquery moves jQuery functionality from a "universal entry point" function, to
-various constants, classes and modules.  A brief summary of these constants:
+Here's a brief summary of these constants:
 
-- Element - bridged class to the jQuery object.
-- Document - object as constance, instance of Element, extended with selected document specific methods.
-- Event - class encapsulating events.
-- HTTP - class wrapping jQuery ajax functionality. 
-- LocalStorage - not part of jQuery, local storage wrapper for convenience.
-- Kernel - extended w/alert() so it's accessible everywhere, like it is in JavaScript.
- 
-
+- =Element= - bridged class to the *jQuery* object.
+- =Document= - object as constance, instance of =Element=, extended with selected document specific methods.
+- =Event= - class encapsulating events.
+- =HTTP= - class wrapping *jQuery* ajax functionality.
+- =LocalStorage= - not part of *jQuery*, local storage wrapper for convenience.
+- =Kernel= - extended with =alert()= so it's accessible everywhere, like it is in JavaScript.
 
 ** Document Ready
 
-In opal-jQuery "Document ready" actions are setup with Document.ready?() method.
+In *Opal-jQuery* "Document ready" actions are setup with =Document.ready?()= method:
 
 #+BEGIN_SRC ruby
   Document.ready? do
@@ -91,11 +87,16 @@ In opal-jQuery "Document ready" actions are setup with Document.ready?() method.
   end
 #+END_SRC
 
-Document.ready?() employs 2 Ruby idioms. Firstly, the method name ends
-in a '?', which reads well to my eyes.  Secondly, it takes a block,
-which also reads well.  Opal-jquery departs from jQuery's behavior
-that allows a variety of ways to setup "Document ready" actions
-through the universal function as an entry point.  The following
+=Document.ready?()= employs 2 Ruby idioms:
+
+    1. The method name ends in a '?', which reads well to my eyes.
+    1. Tt takes a block, which also reads well.  *Opal-jquery* departs from *jQuery*'s
+       single universal function for all of the ways to setup "Document ready" actions.
+
+*Scott: is the following paragraph and code examples needed?  It confused me more than enlightened me;
+it has never dawned on me that I would do a =Element.ready?=; I would always apply this to =Document=.*
+
+The following
 examples, which are roughly analogous to some of the sample "Document
 ready" Javascript examples, do NOT work.  The methods don't exist.  I
 feel this expresses the intent clearly and are less of a violation of
@@ -106,11 +107,10 @@ the Principle of Least Surprise.
   Element.find('a').ready? { action }     # this doesn't either
 #+END_SRC
 
-
 * Blocks
 
-As is typical with Ruby, in Opal-jquery we make use of blocks where
-anonymous functions are typically used in jQuery, or JavaScript in
+As is typical with Ruby, in *Opal-jquery* we make use of blocks where
+anonymous functions are typically used in *jQuery*, or JavaScript in
 general.  The examples read well.
 
 #+BEGIN_SRC ruby
@@ -119,7 +119,7 @@ general.  The examples read well.
   element.on(:click) { |event| alert("#{evt.current_target} been clicked") } # event
 #+END_SRC
 
-I will note that you can pass lambdas, methods, etc. in place of a
+Note that you can pass lambdas, methods, etc. in place of a
 block, similar to how one would use a named function or function stored in a
 variable in JavaScript.
 
@@ -137,14 +137,13 @@ variable in JavaScript.
   element.on(:click) &instance_method
 #+END_SRC
 
-
 * Consistency with Native
 
 #+ATTR_HTML: :target "_blank"
-In [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I showed how attributes of Native
-are accessed by the [] and []= methods.  Element instances adhere to
+In [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I showed how attributes of =Native=
+are accessed by the =[]= and =[]\== methods.  =Element= instances adhere to
 this convention. - Consistency is good and helps support the
-Principle of Least Surprise.
+*Principle of Least Surprise*.
 
 #+BEGIN_SRC ruby
   native = Native(`returnsJsObject`)
@@ -157,14 +156,11 @@ Principle of Least Surprise.
 
 #+END_SRC
 
-
 * Conclusion
 
-Hopefully the Rubyist reader can see how wrapping jQuery is
-preferable.  The code reads well, expresses intent clearly, and uses
+For the Rubyist reader, there are advantages in wrapping *jQuery* in *Opal-JQuery*:
+the code reads well, expresses intent clearly, and uses
 conventions and idioms that a Rubyist should already be familiar with.
-Hopefully this brief overview gives you ideas on how one could wrap a
-JavaScript library w/idiomatic Ruby for similar benefits.  In a future
-articles, we will look at more of Ruby-fication of jQuery's API, as
-well as the technical specifics of jQuery was wrapped, giving you
-techniques to wrap other JavaScript libraries.
+Hopefully this brief overview gives you ideas on how one could wrap other
+JavaScript libraries w/idiomatic Ruby for similar benefits.  In a future
+article, we'll show you even more techniques by exploring the Opal library code that wraps jQuery's API.
