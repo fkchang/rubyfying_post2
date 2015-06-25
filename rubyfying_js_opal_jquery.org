@@ -51,7 +51,7 @@ constants themselves.
 #+END_SRC
 
 I like that =find()= is a consistent selector. It can find from the
-top, and relative to an Element instance.
+top, and relative to an =Element= instance.
 
 #+BEGIN_SRC ruby
   mydiv = Element.find '#mydiv'
