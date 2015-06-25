@@ -7,16 +7,16 @@ why are best shown by example.
 
 #+ATTR_HTML: :target "_blank"
 Let's look at [[https://github.com/opal/opal-jquery][Opal-jquery]], one of the "official Opal libraries", as a
-source of good concrete examples. =Opal-jquery= wraps jQuery
-with an idiomatic Ruby frontend.  There are some differences from the
+source of good concrete examples. *Opal-jquery* wraps *jQuery*
+with an idiomatic *Ruby* frontend.  There are some differences from the
 original JavaScript API, but my opinion it that these changes are for
 the better.
 
 * Basic jQuery
 
 I call the =jQuery/$= function "jQuery's universal entry point."  Nearly
-all uses of =jQuery= start from this function.  One of the primary uses
-of =$= is as a selector for elements.  It is very typical to chain one
+all uses of *jQuery* start from this function.  One of the primary uses
+of *$* is as a selector for elements.  It is very typical to chain one
 or more actions directly from the selector, as shown here:
 
 #+BEGIN_SRC javascript
@@ -60,7 +60,7 @@ top, and relative to an =Element= instance.
 
 =Opal-jquery= also implements a Ruby convention where the =Element.[]=
 method is used as a selector. This comes in handy for those who miss
-the terseness of $.
+the terseness of *$*.
 
 #+BEGIN_SRC ruby
   mydiv = Element['#mydiv']
@@ -93,7 +93,8 @@ In *Opal-jQuery* "Document ready" actions are setup with =Document.ready?()= met
     1. Tt takes a block, which also reads well.  *Opal-jquery* departs from *jQuery*'s
        single universal function for all of the ways to setup "Document ready" actions.
 
-*Scott: is the following paragraph and code examples needed?  It confused me more than enlightened me.*
+*Scott: is the following paragraph and code examples needed?  It confused me more than enlightened me;
+it has never dawned on me that I would do a =Element.ready?=; I would always apply this to =Document=.*
 
 The following
 examples, which are roughly analogous to some of the sample "Document
@@ -162,6 +163,4 @@ the code reads well, expresses intent clearly, and uses
 conventions and idioms that a Rubyist should already be familiar with.
 Hopefully this brief overview gives you ideas on how one could wrap other
 JavaScript libraries w/idiomatic Ruby for similar benefits.  In a future
-article, we'll look at more "Ruby-fication" of jQuery's API as
-well as the "internals" of how jQuery was wrapped, giving you
-even more techniques to wrap other JavaScript libraries.
+article, we'll show you even more techniques by exploring the Opal library code that wraps jQuery's API.
