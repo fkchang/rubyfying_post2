@@ -2,22 +2,22 @@
 
 #+ATTR_HTML: :target "_blank"
 In my last post about [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I asserted ("argued" works here too) that
-it is preferable to wrap JavaScript libraries in Opal; the reasons
+it is preferable to wrap JavaScript libraries in *Opal*; the reasons
 why are best shown by example.
 
 #+ATTR_HTML: :target "_blank"
 Let's look at [[https://github.com/opal/opal-jquery][Opal-jquery]], one of the "official Opal libraries", as a
-source of good concrete examples. Opal-jquery wraps jQuery
+source of good concrete examples. =Opal-jquery= wraps jQuery
 with an idiomatic Ruby frontend.  There are some differences from the
 original JavaScript API, but my opinion it that these changes are for
 the better.
 
 * Basic jQuery
 
-I call the jQuery/$ function "jQuery's universal entry point."  Nearly
-all uses of jQuery start from this function.  One of the primary uses
-of $ is as a selector for elements.  It is very typical to chain one
-or more actions directly off the selector, as shown below.
+I call the =jQuery/$= function "jQuery's universal entry point."  Nearly
+all uses of =jQuery= start from this function.  One of the primary uses
+of =$= is as a selector for elements.  It is very typical to chain one
+or more actions directly off the selector, as shown here:
 
 #+BEGIN_SRC javascript
   $('a').action()                                 // select by node type
@@ -27,7 +27,7 @@ or more actions directly off the selector, as shown below.
 
 Interestingly, this same "universal entry point" function is also how
 one sets up "Document ready" actions.  All of the various invocations
-below *can* be used to setup "Document ready" actions.
+below /can/ be used to setup "Document ready" actions.
 
 #+BEGIN_SRC javascript
   $(document).ready(function() {alert('document is ready')});
