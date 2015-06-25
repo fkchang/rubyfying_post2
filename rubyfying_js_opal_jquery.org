@@ -1,7 +1,7 @@
 #+OPTIONS: num:nil
 
 #+ATTR_HTML: :target "_blank"
-In my last post about [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I asserted ("argued" works here too) that
+In my last post about [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I asserted that
 it is preferable to wrap JavaScript libraries in *Opal*; the reasons
 why are best shown by example.
 
@@ -16,7 +16,7 @@ the better.
 
 I call the =jQuery/$= function "jQuery's universal entry point."  Nearly
 all uses of *jQuery* start from this function.  One of the primary uses
-of *$* is as a selector for elements.  It is very typical to chain one
+of =$= is as a selector for elements.  It is very typical to chain one
 or more actions directly from the selector, as shown here:
 
 #+BEGIN_SRC javascript
@@ -34,6 +34,7 @@ below /can/ be used to setup "Document ready" actions.
   $('p').ready(function(){alert('fires whether or not there is p element')});
   $('never-matching_selector').ready(function(){alert('still fires')});
   $().ready(function() { alert('this works, but the doc says "not recommended"')});
+  $(function(){ alert('function called directly');});
 #+END_SRC
 
 * Ruby-fying Javascript - Object oriented basic jQuery
@@ -46,7 +47,7 @@ constants themselves.
 ** Selectors
 #+BEGIN_SRC ruby
   Element.find('#mydiv')          # top level find
-  Document.find('#mydiv')         # equivalent to the above
+  Document.find('#mydiv')         # Document is a special instance of Element
   Element.id('mydiv')             # find by id
 #+END_SRC
 
@@ -68,7 +69,9 @@ the terseness of *$*.
   help_sections = Element['.help']
 #+END_SRC
 
-Here's a brief summary of these constants:
+Opal-jquery moves jQuery functionality from a "universal entry point"
+function, to appropriate constants, classes and modules. Here's a
+brief summary of these constants:
 
 - =Element= - bridged class to the *jQuery* object.
 - =Document= - object as constance, instance of =Element=, extended with selected document specific methods.
@@ -93,18 +96,18 @@ In *Opal-jQuery* "Document ready" actions are setup with =Document.ready?()= met
     1. Tt takes a block, which also reads well.  *Opal-jquery* departs from *jQuery*'s
        single universal function for all of the ways to setup "Document ready" actions.
 
-*Scott: is the following paragraph and code examples needed?  It confused me more than enlightened me;
-it has never dawned on me that I would do a =Element.ready?=; I would always apply this to =Document=.*
 
-The following
-examples, which are roughly analogous to some of the sample "Document
-ready" Javascript examples, do NOT work.  The methods don't exist.  I
-feel this expresses the intent clearly and are less of a violation of
-the Principle of Least Surprise.
+A number of the "Document ready" Javascript examples I showed above
+work, but don't make logical sense - i.e. calling =ready()= off of the
+results of a selector where the element is not =document=.  In
+*Opal-jQuery* you can only set "Document ready" actions with
+=Document.ready= .  I feel this expresses the intent clearly and makes
+for less of a violation of the Principle of Least Surprise, but not
+even having the option to construct semantically odd lines.  The
+following below will *not* work because there is no =Element#ready?()=
 
 #+BEGIN_SRC ruby
-  Element.ready? { action }               # doesn't work, no ready? method
-  Element.find('a').ready? { action }     # this doesn't either
+  Element.find('a').ready? { action }     # equivalent to $('a').ready(function(){action});
 #+END_SRC
 
 * Blocks
@@ -141,7 +144,7 @@ variable in JavaScript.
 
 #+ATTR_HTML: :target "_blank"
 In [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I showed how attributes of =Native=
-are accessed by the =[]= and =[]\== methods.  =Element= instances adhere to
+are accessed by the =[]= and =[]== methods.  =Element= instances adhere to
 this convention. - Consistency is good and helps support the
 *Principle of Least Surprise*.
 
@@ -158,9 +161,12 @@ this convention. - Consistency is good and helps support the
 
 * Conclusion
 
-For the Rubyist reader, there are advantages in wrapping *jQuery* in *Opal-JQuery*:
-the code reads well, expresses intent clearly, and uses
+For the Rubyist reader, there are advantages in wrapping *jQuery* in
+*Opal-JQuery*: the code reads well, expresses intent clearly, and uses
 conventions and idioms that a Rubyist should already be familiar with.
-Hopefully this brief overview gives you ideas on how one could wrap other
-JavaScript libraries w/idiomatic Ruby for similar benefits.  In a future
-article, we'll show you even more techniques by exploring the Opal library code that wraps jQuery's API.
+Hopefully this brief overview gives you ideas on how one could wrap
+other JavaScript libraries w/idiomatic Ruby for similar benefits.  In
+future articles we will look at more examples of Ruby-fication of
+jQuery's API, as well as show you some techniques used to wrap jQuery
+so that you might be able to apply them to wrapping other JavaScript
+libraries.
