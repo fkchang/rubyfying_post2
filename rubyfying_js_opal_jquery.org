@@ -17,7 +17,7 @@ the better.
 I call the =jQuery/$= function "jQuery's universal entry point."  Nearly
 all uses of =jQuery= start from this function.  One of the primary uses
 of =$= is as a selector for elements.  It is very typical to chain one
-or more actions directly off the selector, as shown here:
+or more actions directly from the selector, as shown here:
 
 #+BEGIN_SRC javascript
   $('a').action()                                 // select by node type
@@ -39,9 +39,9 @@ below /can/ be used to setup "Document ready" actions.
 * Ruby-fying Javascript - Object oriented basic jQuery
 
 Rather than having a function that is the universal entry point,
-opal-jquery assigns selector entry points to appropriate constants
-(classes/objects).  At the top level, we call these selectors off the
-constant themselves
+=opal-jquery= assigns selector entry points to appropriate constants
+(classes/objects).  At the top level, we call these selectors from the
+constants themselves.
 
 ** Selectors
 #+BEGIN_SRC ruby
@@ -50,7 +50,7 @@ constant themselves
   Element.id('mydiv')             # find by id
 #+END_SRC
 
-I like that find() is a consistent selector. It's can find from the
+I like that =find()= is a consistent selector. It can find from the
 top, and relative to an Element instance.
 
 #+BEGIN_SRC ruby
@@ -58,8 +58,8 @@ top, and relative to an Element instance.
   h1_children_of_mydiv = mdiv.find 'h1'
 #+END_SRC
 
-Opal-jquery also implements a Ruby convention where the Element.[]
-method is used as a selector. This come in handy for those who miss
+=Opal-jquery= also implements a Ruby convention where the =Element.[]=
+method is used as a selector. This comes in handy for those who miss
 the terseness of $.
 
 #+BEGIN_SRC ruby
@@ -68,21 +68,18 @@ the terseness of $.
   help_sections = Element['.help']
 #+END_SRC
 
-Opal-jquery moves jQuery functionality from a "universal entry point" function, to
-various constants, classes and modules.  A brief summary of these constants:
+Here's a brief summary of these constants:
 
-- Element - bridged class to the jQuery object.
-- Document - object as constance, instance of Element, extended with selected document specific methods.
-- Event - class encapsulating events.
-- HTTP - class wrapping jQuery ajax functionality.
-- LocalStorage - not part of jQuery, local storage wrapper for convenience.
-- Kernel - extended w/alert() so it's accessible everywhere, like it is in JavaScript.
-
-
+- =Element= - bridged class to the *jQuery* object.
+- =Document= - object as constance, instance of =Element=, extended with selected document specific methods.
+- =Event= - class encapsulating events.
+- =HTTP= - class wrapping *jQuery* ajax functionality.
+- =LocalStorage= - not part of *jQuery*, local storage wrapper for convenience.
+- =Kernel= - extended with =alert()= so it's accessible everywhere, like it is in JavaScript.
 
 ** Document Ready
 
-In opal-jQuery "Document ready" actions are setup with Document.ready?() method.
+In *Opal-jQuery* "Document ready" actions are setup with =Document.ready?()= method:
 
 #+BEGIN_SRC ruby
   Document.ready? do
@@ -90,11 +87,15 @@ In opal-jQuery "Document ready" actions are setup with Document.ready?() method.
   end
 #+END_SRC
 
-Document.ready?() employs 2 Ruby idioms. Firstly, the method name ends
-in a '?', which reads well to my eyes.  Secondly, it takes a block,
-which also reads well.  Opal-jquery departs from jQuery's behavior
-that allows a variety of ways to setup "Document ready" actions
-through the universal function as an entry point.  The following
+=Document.ready?()= employs 2 Ruby idioms:
+
+    1. The method name ends in a '?', which reads well to my eyes.
+    1. Tt takes a block, which also reads well.  *Opal-jquery* departs from *jQuery*'s
+       single universal function for all of the ways to setup "Document ready" actions.
+
+*Scott: is the following paragraph and code examples needed?  It confused me more than enlightened me.*
+
+The following
 examples, which are roughly analogous to some of the sample "Document
 ready" Javascript examples, do NOT work.  The methods don't exist.  I
 feel this expresses the intent clearly and are less of a violation of
@@ -104,7 +105,6 @@ the Principle of Least Surprise.
   Element.ready? { action }               # doesn't work, no ready? method
   Element.find('a').ready? { action }     # this doesn't either
 #+END_SRC
-
 
 * Blocks
 
