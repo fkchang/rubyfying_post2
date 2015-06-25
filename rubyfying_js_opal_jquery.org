@@ -1,14 +1,13 @@
 #+OPTIONS: num:nil
 
 #+ATTR_HTML: :target "_blank"
-In my last post about [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I mentioned that
-it is preferable to wrap JavaScript libraries in Opal.  I feel the
-answers to "Why is it preferrable to wrap JavaScript in an idiomatic
-Ruby fashion?" are best shown by example.
+In my last post about [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][accessing JavaScript from Opal]], I asserted ("argued" works here too) that
+it is preferable to wrap JavaScript libraries in Opal; the reasons
+why are best shown by example.
 
 #+ATTR_HTML: :target "_blank"
 Let's look at [[https://github.com/opal/opal-jquery][Opal-jquery]], one of the "official Opal libraries", as a
-source of examples good concrete examples. Opal-jquery wraps jQuery
+source of good concrete examples. Opal-jquery wraps jQuery
 with an idiomatic Ruby frontend.  There are some differences from the
 original JavaScript API, but my opinion it that these changes are for
 the better.
@@ -16,7 +15,7 @@ the better.
 * Basic jQuery
 
 I call the jQuery/$ function "jQuery's universal entry point."  Nearly
-all uses of jQuery start from this function .  One of the primary uses
+all uses of jQuery start from this function.  One of the primary uses
 of $ is as a selector for elements.  It is very typical to chain one
 or more actions directly off the selector, as shown below.
 
@@ -31,7 +30,7 @@ one sets up "Document ready" actions.  All of the various invocations
 below *can* be used to setup "Document ready" actions.
 
 #+BEGIN_SRC javascript
-  $(document).ready(function() {alert('document is ready')});                      
+  $(document).ready(function() {alert('document is ready')});
   $('p').ready(function(){alert('fires whether or not there is p element')});
   $('never-matching_selector').ready(function(){alert('still fires')});
   $().ready(function() { alert('this works, but the doc says "not recommended"')});
@@ -75,10 +74,10 @@ various constants, classes and modules.  A brief summary of these constants:
 - Element - bridged class to the jQuery object.
 - Document - object as constance, instance of Element, extended with selected document specific methods.
 - Event - class encapsulating events.
-- HTTP - class wrapping jQuery ajax functionality. 
+- HTTP - class wrapping jQuery ajax functionality.
 - LocalStorage - not part of jQuery, local storage wrapper for convenience.
 - Kernel - extended w/alert() so it's accessible everywhere, like it is in JavaScript.
- 
+
 
 
 ** Document Ready
