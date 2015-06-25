@@ -93,7 +93,7 @@ In *Opal-jQuery* "Document ready" actions are setup with =Document.ready?()= met
 =Document.ready?()= employs 2 Ruby idioms:
 
     1. The method name ends in a '?', which reads well to my eyes.
-    1. Tt takes a block, which also reads well.  *Opal-jquery* departs from *jQuery*'s
+    2. It takes a block, which also reads well.  *Opal-jquery* departs from *jQuery*'s
        single universal function for all of the ways to setup "Document ready" actions.
 
 
