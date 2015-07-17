@@ -1,0 +1,181 @@
+#+OPTIONS: num:nil toc:nil
+
+#+ATTR_HTML: :target "_blank"
+
+* Situation
+
+#+ATTR_HTML: :target "_blank"
+I was reviewing a pull request from a non colocated team mate.  In
+discussing the pull request, I realized one of the assertions on his
+spec (we use [[http://rspec.info][rspec]]) didn't work exactly the way he thought.  To aid in
+discussion, I sent him some code via chat. Shortly thereafter, I
+realized I could do better than just pasting in some code.
+
+"Do better?" you ask.  What do I mean? In general, what's the problem
+with sending a teammate a spec via chat, email, whatever?
+- Often you have to run it to fully understand it, which means:
+  - You have to cut and paste the code somewhere
+  - You need setup a spec or at add it to a spec and rerun that
+    spec. Preferably you could just run just the supplied spec in
+    question to save both execution time, and to cut down on the
+    unrelated information of the other specs runnin
+
+That can be a bit of a hassle, esp. when using Rails, which happened
+to be the case here where specs often do not run that fast.  It's that
+running them is undoable, but it's enough work that one wouldn't just
+immediately go and do it.
+
+What if I could send someone specs that:
+- ran nearly instantenously
+- didn't require any setup
+
+It turns out you can.
+
+*  Solution
+#+ATTR_HTML: :target "_blank"
+Besides the jsbin like workspace [[http://fkchang.github.io/opal-playground][opal-playground]] has an [[http://fkchang.github.io/opal-playground/rspec/][rspec]] page
+that lets you do just that. I actually went to the rspec page first to
+test out my theory. Once I confirmed my theory, I sent that code via
+chat.  I realized it would be more effective if I sent the link directly
+to him, which is the following
+#+ATTR_HTML: :target "_blank"
+[[http://git.io/vmalc][(direct link]] if below iframe doesn't look right)
+
+#+BEGIN_HTML
+<iframe width="100%" height="500" src="http://git.io/vmalc" frameborder="0" allowfullscreen></iframe>
+#+END_HTML
+
+* The Problem
+The problem in the PR was that there was an assertion along the lines
+(not the actual PR code, but a simplified example to show how the
+expecations work) of the below
+#+BEGIN_SRC ruby
+  allow_any_instance_of(User).to receive(:name)
+#+END_SRC
+
+But there was no direct invocation of that method that was supposed to
+be received.  The specs passed, but it does not prove that the method
+was called.  I typically see =allow_any_instance_of()= as used to
+stub, not put expectations, so it was my belief that one could not
+call the method and the test would pass.  So in my example spec, the
+1st spec puts the expectation on name and then calls it.
+
+#+BEGIN_SRC ruby
+  it "should initialize with the given name" do
+    allow_any_instance_of(   User).to receive(:name)
+    u = User.new
+    u.name
+  end
+#+END_SRC
+
+The spec passes as expected.  In the 2nd spec, I make the same
+expectation, but I never call u.name.  It still passes, as I expected,
+but not as my teammate expected
+
+#+BEGIN_SRC ruby
+  it "should fail" do
+    allow_any_instance_of(   User).to receive(:name)
+    u = User.new
+  end
+#+END_SRC
+
+Before my teammate had the time to digest the implications, he
+countered with a suggestion code suggestion.
+
+#+BEGIN_QUOTE
+try allow_any_instance_of(Kass).to receive(:stuff).with(params)
+#+END_QUOTE
+
+To which I replied
+
+#+BEGIN_QUOTE
+why should adding with make it pass?
+#+END_QUOTE
+
+Following my lead, he countered with his own spec to demonstart
+
+#+ATTR_HTML: :target "_blank"
+([[http://git.io/vma45][direct link]] if below iframe doesn't look right)
+#+BEGIN_HTML
+<iframe width="100%" height="500" src="http://git.io/vma45" frameborder="0" allowfullscreen></iframe>
+#+END_HTML
+
+What his spec showed was that is if he added a parameter expecation,
+and the method expected to be called was called, but not with that
+parameter, the spec will fail
+
+#+BEGIN_SRC ruby
+  it "should fail" do
+    allow_any_instance_of(User).to receive(:name).with('hello')
+    u = User.new
+    u.name
+  end
+#+END_SRC
+
+Soon thereafter, he reasoned about he realized I was right.
+
+#+BEGIN_QUOTE
+oh... but I see that you're saying what if it's not called at all?
+#+END_QUOTE
+
+To confirm his understand, I sent a spec which uses his expectation,
+should fail if his understanding was correct, but passed
+
+#+ATTR_HTML: :target "_blank"
+([[http://git.io/vqMDa][direct link]] if below iframe doesn't look right)
+
+#+BEGIN_HTML
+<iframe width="100%" height="500" src="http://git.io/vqMDa" frameborder="0" allowfullscreen></iframe>
+#+END_HTML
+
+#+BEGIN_SRC ruby
+  it "will pass if not called at all" do
+    allow_any_instance_of(User).to receive(:name).with('hello')
+    u = User.new
+  end
+#+END_SRC
+
+With that knowledge gained, my teammate was able to construct his spec
+in a way that tested what it was supposed to.
+
+* Summary
+In doing code discussion, some tool support can be handy.  Sometimes
+even the exact code is not enough - while it's not ambiguous to the
+interpreter or compiler, it's not always so to the program.  A key
+goal of Agile is to improve communication.  In this case, discussing
+rspec specs, this the rspec page helped a bunch.
+
+It was:
+- Quick, write some, easily run without any setup
+- Collaborative, you can send them back and forth
+- Facillitated communication - my teammate quickly responded in kind
+- Retainable as a url - he can always go back and review the example
+  via the url vs. digging through a large spec file to find it.
+- While facilitated by opal, isn't limited to opal, the code in
+  question was backend code.
+
+I also realize you use to use it to send exercises while mentoring, or
+in a code interview without needing setup.
+
+Try it, you might like it
+
+* Thoughts
+
+
+
+
+
+- sent him a link
+- discuss
+Having a coding discussion, need
+
+Ever
+
+collabo
+
+* advantages
+
+if colocated that is good, but this also is something you can stick with,  he can go back into hipchat and get reference to this, try that with real rspec
+
+* Teaser
+More collobarative thngs for opal
