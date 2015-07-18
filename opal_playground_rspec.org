@@ -150,32 +150,20 @@ It was:
 - Collaborative, you can send them back and forth
 - Facillitated communication - my teammate quickly responded in kind
 - Retainable as a url - he can always go back and review the example
-  via the url vs. digging through a large spec file to find it.
+  via the url vs. digging through a large spec file to find
+  it. Related to Agile, colocation is best for the best communication,
+  but "executable rspec gists" would still be handy
 - While facilitated by opal, isn't limited to opal, the code in
   question was backend code.
+
+
 
 I also realize you use to use it to send exercises while mentoring, or
 in a code interview without needing setup.
 
 Try it, you might like it
 
-* Thoughts
-
-
-
-
-
-- sent him a link
-- discuss
-Having a coding discussion, need
-
-Ever
-
-collabo
-
-* advantages
-
-if colocated that is good, but this also is something you can stick with,  he can go back into hipchat and get reference to this, try that with real rspec
-
 * Teaser
-More collobarative thngs for opal
+
+I plan on making some blog posts on how opal based tools can help with
+collabor.ation
