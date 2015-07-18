@@ -166,4 +166,4 @@ Try it, you might like it
 * Teaser
 
 I plan on making some blog posts on how opal based tools can help with
-collabor.ation
+collaboration
