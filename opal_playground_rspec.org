@@ -34,25 +34,32 @@ The remainder of this article shows you how.
 
 * Solution
 #+ATTR_HTML: :target "_blank"
-Like the =jsbin=-like workspace, [[http://fkchang.github.io/opal-playground][opal-playground]] has a [[http://fkchang.github.io/opal-playground/rspec/][page]]
-configured to run spec tests by pasting them in and executing. Now instead of sending
-my co-workers snippets of code, I test the spec in the Opal playground and test it.
-When I'm satisfied that it's doing what I want, I send the link directly
-to him.  Here's what it looks like:
+Aside from the =jsbin=-like workspace, [[http://fkchang.github.io/opal-playground][opal-playground]] has a [[http://fkchang.github.io/opal-playground/rspec/][rspec
+page]] configured to run spec tests by writing or pasting them in and
+executing. Now instead of sending my co-workers snippets of code, I
+test the spec in the Opal playground and test it.  When I'm satisfied
+that it's doing what I want, I send the link directly to him.  Here's
+what I originally pasted to him:
 #+ATTR_HTML: :target "_blank"
-[[http://git.io/vmalc][(direct link]] if below iframe doesn't look right).  You can vertically scroll
+(I've embedded the actual rspec page in an iframe [[http://git.io/vmalc][direct link]] if below
+iframe doesn't look right in your browser).  You can vertically scroll
 the text pane to see the remaining *rspec* content.
 
 #+BEGIN_HTML
 <iframe width="100%" height="500" src="http://git.io/vmalc" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
-Note that if you press the blue button, *Run Code*..., that both tests pass.
-Notice that the 2nd test's "it" statement says it should fail, but it passes.
+Note that both tests pass.  You can change the code and press the blue
+*Run Code* button to run it again. Notice that the 2nd test's "it"
+statement says it should fail, but it passes.
 
 * How Technology Helped Solve the Original Problem
-The teammate's pull request contained a rspec stating that a method
-=#name= must be invoked.
+
+The code in these rspec pages is not the code in the pull request, but rather
+simplified code that exercises expectations in the same or similar
+fashion to the code in the original pull request. The problem in the original
+pull request contained an rspec stating that a method (in this sample's
+case =#name=) must be invoked.
 
 #+BEGIN_SRC ruby
   it "should initialize with the given name" do
@@ -61,9 +68,9 @@ The teammate's pull request contained a rspec stating that a method
   end
 #+END_SRC
 
-As you can see above, the =#name= method is never invoked and yet
-the specs still passes.  So I changed the "it" comment to point
-this out and sent it to the teammate:
+As you can see above, the =#name= method is never invoked and yet the
+spec still passes.  So I changed the "it" comment to point this out
+and sent it back to the teammate:
 
 #+BEGIN_SRC ruby
   it "should fail" do
@@ -85,7 +92,7 @@ To which I replied
 Why should adding =with= make it pass?
 #+END_QUOTE
 
-Following my lead, he countered with his own spec to demonstart
+Following my lead, he countered with his own spec to demonstrate
 
 #+ATTR_HTML: :target "_blank"
 ([[http://git.io/vma45][direct link]] if below iframe doesn't look right)
@@ -121,6 +128,8 @@ should fail if his understanding was correct, but passed:
 <iframe width="100%" height="500" src="http://git.io/vqMDa" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
+Above is the spec in question that proved my point, which was the mistake in his PR.
+
 #+BEGIN_SRC ruby
   it "will pass if not called at all" do
     allow_any_instance_of(User).to receive(:name).with('hello')
@@ -143,19 +152,18 @@ It was:
 - Collaborative: you can send them back and forth
 - Facillitated communication: my teammate quickly responded in kind
 - Retainable as a url: he can always go back and review the example
-  via the url vs. digging through a large spec file to find
-  it. While collocation is best for communication,
-  "executable rspec gists" can help to mitigete the "distance" barrier
-  when the teammate is remote.
+  via the url vs. digging through a large spec file to find it. While
+  collocation is best for communication, "executable rspec gists" can
+  help to mitigate the "distance" barrier when the teammate is remote.
 - While facilitated by opal, the code itself doesn't have to be client-side opal;
   the code discussed above was, indeed, backend code.
 
 Other uses:
 
-- send exercises while mentoring
-- perform a code interview without needing setup.
+- Send exercises while mentoring
+- Perform a code interview without needing setup.
 
 * Teaser
 
-I plan on making some blog posts on how opal based tools can help with
+I plan on making some more blog posts on how opal based tools can help with
 collaboration
