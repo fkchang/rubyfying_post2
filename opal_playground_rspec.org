@@ -49,8 +49,9 @@ the text pane to see the remaining *rspec* content.
 #+END_HTML
 
 Note that both tests pass.  You can change the code and press the blue
-*Run Code* button to run it again. Notice that the 2nd test's "it"
-statement says it should fail, but it passes.
+*Run Code* button (it will be under the "hamburger menu" in the upper
+right corner if the browser width is narrow enough) to run it again. Notice
+that the 2nd test's "it" statement says it should fail, but it passes.
 
 * How Technology Helped Solve the Original Problem
 
