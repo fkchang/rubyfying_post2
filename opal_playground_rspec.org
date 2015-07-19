@@ -7,21 +7,20 @@
 #+ATTR_HTML: :target "_blank"
 I was reviewing a pull request from a non-colocated team mate.  In
 discussing the pull request, I realized one of the assertions on his
-spec (we use [[http://rspec.info][rspec]]) didn't work exactly the way he expected.  To aid in the
-discussion, I sent him some code via chat. Shortly thereafter, I
-realized I could do better than just pasting in some code.
+spec (we use [[http://rspec.info][rspec]]) didn't work exactly the way he expected.  To aid
+in the discussion, I sent him some code via chat. Shortly thereafter,
+I realized I could do better than just pasting in some code.
 
 "Do better?" you ask.  What do I mean? In general, what's the problem
 with sending a teammate a spec via chat, email, whatever?
 
-When the teammate receives the code, he may want to run it in order to understand it.
-In this case, being a spec
-file, he will need to paste the code into a running test system
-to explore how it works.
+When the teammate receives the code, he may want to run it in order to
+understand it.  In this case, being a spec file, he will need to paste
+the code into a running test system to explore how it works.
 
-That can be a bit of a hassle, especially when using Rails
-where specs often do not run that fast.  It's not that
-running them is impossible, but it may be sufficiently inconvenient that one wouldn't just
+That can be a bit of a hassle, especially when using Rails where specs
+often do not run that fast.  It's not that running them is impossible,
+but it may be sufficiently inconvenient that one wouldn't just
 immediately do it.
 
 Here's the epiphany:
@@ -125,7 +124,7 @@ should fail if his understanding was correct, but passed:
 ([[http://git.io/vqMDa][direct link]] if below iframe doesn't look right)
 
 #+BEGIN_HTML
-<iframe width="100%" height="500" src="http://git.io/vqMDa" frameborder="0" allowfullscreen></iframe>
+<iframe width="100%" height="550" src="http://git.io/vqMDa" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
 Above is the spec in question that proved my point, which was the mistake in his PR.
