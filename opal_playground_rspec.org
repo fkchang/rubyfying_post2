@@ -40,7 +40,8 @@ test the spec in the Opal playground and test it.  When I'm satisfied
 that it's doing what I want, I send the link directly to him.  Here's
 what I originally pasted to him:
 #+ATTR_HTML: :target "_blank"
-[[http://git.io/vmalc][(direct link]] if below iframe doesn't look right).  You can vertically scroll
+(I've embedded the actual rspec page in an iframe [[http://git.io/vmalc][direct link]] if below
+iframe doesn't look right in your browser).  You can vertically scroll
 the text pane to see the remaining *rspec* content.
 
 #+BEGIN_HTML
