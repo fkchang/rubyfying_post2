@@ -1,0 +1,60 @@
+* irb history 1
+1: $duration = 5000
+2: $fill = 'orange'; animate
+3: $fill = 1000
+4: $fill = 'yellow'; animate
+5: def reset
+  $paper.clear
+  $circle = $paper.circle(100,100, 60)
+end
+6: reset
+7: animate
+8: $fill = 'blue'
+9: animate
+10: reset; $ stroke = '#111'
+11: reset; $stroke = '#111'
+12: animate
+13: $fill
+14: rest
+15: reset
+16: animate
+17: $circle.attr(fill: 'pink')
+18: animate
+19: reset
+20: $circle.attr(fill: 'pink')
+21: animate
+22: reset
+23: $circle.attr(fill: 'brown')
+24: animate
+25: text = paper.text( 10, 10, 'irb is cool')
+26: text = $paper.text( 10, 10, 'irb is cool')
+27: text.attr :color => 'green'
+28: text.attr :fill => 'green'
+29: text.rotate(45)
+30: text.rotate(-145)
+31: text.rotate1455)
+32: text.rotate1(145)
+33: text.rotate1(-4545)
+34: text.rotate1(-45)
+35: text.rotate(-45)
+36: text.rotate(145)
+37: curve_path = $paper.path("M110,10s55,25 40,80Z");
+38: curve_path.attr fill: 'blue'
+39: curve_path.rotate(45
+
+* Different than jsbin, irb
+I recently enhanced Adam's Beynon's opal-playground.  I added irb, why
+
+* Why, editor blub
+Why would you want one
+
+* Example, poor one, but give you a hit
+
+* code
+** require_js
+** timer, async
+* Could reload
+* how about change in place
+* define reset
+* paste in code from irb
+* history baby!

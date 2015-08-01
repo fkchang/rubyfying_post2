@@ -55,10 +55,10 @@ that the 2nd test's "it" statement says it should fail, but it passes.
 
 * How Technology Helped Solve the Original Problem
 
-The code in these rspec pages are not the code in the PR, but rather
+The code in these rspec pages is not the code in the pull request, but rather
 simplified code that exercises expectations in the same or similar
-fashion to the code in the original PR. The problem in the original
-pull request contained a rspec stating that a method (in this sample's
+fashion to the code in the original pull request. The problem in the original
+pull request contained an rspec stating that a method (in this sample's
 case =#name=) must be invoked.
 
 #+BEGIN_SRC ruby
@@ -69,8 +69,8 @@ case =#name=) must be invoked.
 #+END_SRC
 
 As you can see above, the =#name= method is never invoked and yet the
-specs still passes.  So I changed the "it" comment to point this out
-and sent it to the teammate:
+spec still passes.  So I changed the "it" comment to point this out
+and sent it back to the teammate:
 
 #+BEGIN_SRC ruby
   it "should fail" do
@@ -128,7 +128,7 @@ should fail if his understanding was correct, but passed:
 <iframe width="100%" height="550" src="http://git.io/vqMDa" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
-The spec in question that proved my point, which was the mistake in his PR.
+Above is the spec in question that proved my point, which was the mistake in his PR.
 
 #+BEGIN_SRC ruby
   it "will pass if not called at all" do
@@ -165,5 +165,5 @@ Other uses:
 
 * Teaser
 
-I plan on making some more log posts on how opal based tools can help with
+I plan on making some more blog posts on how opal based tools can help with
 collaboration
