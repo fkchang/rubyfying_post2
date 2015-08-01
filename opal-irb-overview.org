@@ -112,7 +112,6 @@ opal> puts $_
  => nil
 opal>
 #+END_SRC
-** subject
 
 ** Help
 
@@ -317,16 +316,19 @@ I have several example opal-irb pages referenced from the README on
 https://github.com/fkchang/opal-irb. They are:
 
 ** Homebrew console example
+#+ATTR_HTML: :target "_blank"
 http://fkchang.github.io/opal-irb/index-homebrew.html
 
 #+BEGIN_HTML
 <iframe width="100%" height="500" src="http://fkchang.github.io/opal-irb/index-homebrew.html" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
+#+ATTR_HTML: :target "_blank"
 This was my 1st attempt, port of a [[https://github.com/larryng/coffeescript-repl][coffescript repl]] with hand written
 terminal code.  It's not as full featured as:
 
 ** jq-console console example
+#+ATTR_HTML: :target "_blank"
 http://fkchang.github.io/opal-irb/index-jq.html
 #+BEGIN_HTML
 <iframe width="100%" height="500" src="http://fkchang.github.io/opal-irb/index-jq.html" frameborder="0" allowfullscreen></iframe>
@@ -338,6 +340,7 @@ might revisit a port of jq-console because I'd like to remove the
 jquery dependency in opal-irb
 
 ** Embedded console example
+#+ATTR_HTML: :target "_blank"
 http://fkchang.github.io/opal-irb/index-embeddable.html
 #+BEGIN_HTML
 <iframe width="100%" height="700" src="http://fkchang.github.io/opal-irb/index-embeddable.html" frameborder="0" allowfullscreen></iframe>
@@ -351,9 +354,11 @@ ways to invoke a hidden opal-irb:
 - hot key
 - click event on a DOM element
 
+#+ATTR_HTML: :target "_blank"
 Both are documented in the [[https://github.com/fkchang/opal-irb/blob/master/README.md][README]]
 
 ** Embedded in opal playground
+#+ATTR_HTML: :target "_blank"
 http://fkchang.github.io/opal-playground/
 #+BEGIN_HTML
 <iframe width="100%" height="800" src="http://fkchang.github.io/opal-playground/" frameborder="0" allowfullscreen></iframe>
@@ -367,7 +372,12 @@ times you want to use a REPL in addition to just editing the code, and
 this provides that.
 
 ** And much more
+#+ATTR_HTML: :target "_blank"
+I demo a good number of these opal-irb features at this point in my [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D1838][RubyConf 2013
+talk "Opal - A New Hope"]] this may be easier to digest than the written word.
+
+#+ATTR_HTML: :target "_blank"
 This is just the beginning of much more with regard to in browser opal
-tools.  I previewed a prototype of opal-inspector 2 years back, and I
+tools.  I [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D2099][previewed]] a prototype of opal-inspector 2 years back, and I
 intend on bringing features previously only supported in smalltalk and
-lisp machines for Ruby browser
+lisp machines for Ruby browser.
