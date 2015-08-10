@@ -376,6 +376,8 @@ this provides that.
 I demo a good number of these opal-irb features at this point in my [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D1838][RubyConf 2013
 talk "Opal - A New Hope"]] this may be easier to digest than the written word.
 
+I also made a [[https://www.youtube.com/watch?v%3DmQTulgBm5Nk][video]] for the in progress auto complete in the console.
+
 #+ATTR_HTML: :target "_blank"
 This is just the beginning of much more with regard to in browser opal
 tools.  I [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D2099][previewed]] a prototype of opal-inspector 2 years back, and I
