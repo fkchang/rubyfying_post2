@@ -10,7 +10,7 @@ My approach has 3 sections:
 - How opal-irb differs from irb
 - Features unique to opal-irb
 
-* In Common with irb
+ In Common with irb
 
 ** Terminal Emulation (of sorts)
 Some people might take this for granted, but irb runs in a terminal,
@@ -372,15 +372,9 @@ http://fkchang.github.io/opal-playground/
 *Opal-irb* has been embedded into my fork of the
 *opal-playground*. *Opal-irb* is available in the RESULTS section by
 hitting the blue "Show Irb" button.  I am hoping to take the
-opal-playground direction more towards opal-inspector, but there are
+opal-playground direction more towards *opal-inspector*, but there are
 times you want to use a REPL in addition to just editing the code, and
 this provides that.
-
-#+BEGIN_QUOTE
-Forrest: could you provide an example of using Opal to modify the characteristics
-of the "Click me" button?  For example, change its background color when it's
-clicked?
-#+END_QUOTE
 
 ** And much more
 #+ATTR_HTML: :target "_blank"
@@ -393,4 +387,4 @@ I also made a [[https://www.youtube.com/watch?v%3DmQTulgBm5Nk][video]] for the i
 This is just the beginning of much more with regard to in browser opal
 tools.  I [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D2099][previewed]] a prototype of opal-inspector 2 years back, and I
 intend on bringing features previously only supported in Smalltalk and
-Lisp machines for Ruby in the browser.
+Lisp machines.
