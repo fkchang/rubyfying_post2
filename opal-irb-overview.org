@@ -1,22 +1,21 @@
 #+OPTIONS: num:nil toc:nil
 
-
 #+ATTR_HTML: :target "_blank"
 I have discovered that many of the features in [[https://github.com/fkchang/opal-irb/blob/master/README.md][opal-irb]] are unknown to
 people I would've expected to have known about those features.  This
 post is an attempt to rectify that.
 
 My approach has 3 sections:
-- What opal-irb in common with with irb
+- What opal-irb has in common with irb
 - How opal-irb differs from irb
 - Features unique to opal-irb
 
-* In common with irb
+ In Common with irb
 
-** Terminal emulation (of sorts)
+** Terminal Emulation (of sorts)
 Some people might take this for granted, but irb runs in a terminal,
 and thus supports terminal formating among other things. Opal-irb
-presently uses a fork of jqconsole, which supports some level of ansi
+presently uses a fork of =jqconsole=, which supports some level of ANSI
 codes display.  For example, to change the default text to red (like
 test runners often do) in opal-irb, you can run the following:
 
@@ -26,16 +25,16 @@ puts "\033[31mRed Text"
 
 
 #+ATTR_HTML: :target "_blank"
-You can try this [[http://git.io/vmQVY][directly here]] if the embedded iframe below doesn't look right
+You can try this [[http://git.io/vmQVY][from here]] if the embedded iframe below doesn't look right
 #+BEGIN_HTML
 <iframe width="100%" height="500" src="http://git.io/vmQVY" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
 ** History up down history
-Like irb, opal-irb stores previous statements in a history.  You can
-navigate this history with the up/down arrows or use the..
+Like irb, opal-irb stores a history of previous statements.  You can
+navigate this history with the up/down arrows or use the "GNU readline commands".
 
-** Gnu readline commands (emacs subset)
+*** GNU readline commands (emacs subset)
 A subset of the gnu readline manipulation is supported. I'll likely
 add more support over time.  The currently supported bindings are:
 
@@ -53,8 +52,8 @@ alt-d:                           Delete 1 word
 #+END_SRC
 
 ** Autocomplete
-A work in progress, (I am presently adding auto complete to the
-multi-line editor), auto complete is supported. It follows the same
+A work-in-progress (I am presently adding auto complete to the
+multi-line editor); auto complete is supported. It follows the same
 tab completion model that irb does.  It looks like this:
 
 #+BEGIN_SRC
@@ -63,14 +62,20 @@ STDERR          STDIN           STDOUT          ScriptError     Set
 SignalException StandardError   StopIteration   String          StringIO
 StringScanner   Struct          Symbol          SyntaxError     SystemCallError
 SystemExit
+#+END_SRC
+
+#+BEGIN_SRC
 opal> ST<tab>
 STDERR STDIN  STDOUT
-opal> STD
-
 #+END_SRC
-** Multi line input
-Like irb, you can input multi line input.  You can type on more than
-one line until the statement is complete. It indicates an incomplete
+
+#+BEGIN_SRC
+opal> STD
+#+END_SRC
+
+** Multi Line Input
+Like *irb*, you can enter multi-line input.  You can type multiple
+lines until your entry is complete. It indicates an incomplete
 line with leading periods:
 
 #+BEGIN_SRC
@@ -157,15 +162,14 @@ alt-d:                           Delete 1 word
 
 #+END_SRC
 
-
 * Beyond irb
 
 There are number of things that opal-irb does that irb does not:
 
 
 ** "Live gist", create a link w/code
-To be able to share the code at the prompt in opal-irb, hit ctl-l (l
-for link), and the link will be shown above the line in question.  To
+To be able to share the code at the prompt in *opal-irb*, hit =ctl-l= (=l=
+for =link=), and the link will be shown above the line in question.  To
 get a link for any other part of the history you can simply navigate
 the history and then hit ctl-l on the desired code.
 
@@ -180,9 +184,10 @@ condition for a coworker to debug.
 The various embedded opal-irb's on this page are all done via "live gist."
 
 ** Enhanced History
-*** history command like shell
-You can type =history= at the prompt get a listing of your history.
-You will get numbered listing of the code you've typed in.
+*** History Command-like Shell
+You can type =history= at the prompt to get a listing of your history.
+You will get a listing of the code you've typed in including line
+numbers.
 
 #+BEGIN_SRC
 opal> history
@@ -196,45 +201,44 @@ end
 4: history
  => nil
 opal>
-
 #+END_SRC
 
-*** link for history
-As an alternate to navigating through history and typing ctrl-l, you
+*** Link for History
+As an alternate to navigating through history and typing =ctrl-l=, you
 can generate a "live gist" with the =irb_link_for= command, using the
 history number shown by the history command.  This behavior differs
-from jsbin, jsfiddle, etc. in that you do a bunch of experimentation
+from =jsbin=, =jsfiddle=, etc. in that you do a bunch of experimentation
 and then quickly generate several "live gists" - a behavior that I
-think matches repl based experimentation.
+think matches repl-based experimentation.
 
 #+BEGIN_SRC
 irb_link_for <history_num>
 #+END_SRC
 
 ** Multiline edit
-While opal-irb supports multi line input in the same fashion as irb, I
-have to confess that I've often made typos with multi ilne input,
-which required me to start over since there is no way edit a previous
-line.  If you've done this, you know my pain.  You have to hit ctrl-c
+While *opal-irb* supports multi-line input in the same fashion as *irb*, I
+have to confess that I've often made typos with multi-line input.
+This required me to start over since there is no way edit a previous
+line.  If you've done this, you know my pain.  You have to hit =ctrl-c=
 to interrupt it and start again.
 
-To address this, I added multiline editor support.  To invoke it, hit
-ctl-m (m for multiline editor) and a window will pop up with whatever
+To address this, I added multi-line editor support.  To invoke it, hit
+=ctl-m= (m for the multi-line editor) and a window will pop up with whatever
 code you had on the prompt.  The editor has syntax highlighting, some
 level smart indenting and a WIP autocomplete functionality.
 
 The editor can be used with all code in the history.  Simply navigate
-back to the desired code in your history and hit ctl-m.
+back to the desired code in your history and hit =ctl-m=.
 
-To run the code either hit the run it button, or the ctl-Enter short cut.
+To run the code either hit the run it button, or the =ctrl-Enter= short cut.
 To close the window, either hit the close icon, or hit escape.
 
 ** Requiring code at run time
-One of the purposes for opal-irb is to be able to explore things at
-run time.  To help facilitate this there are 2 commands.
+One of the purposes for *opal-irb* is to be able to explore things at
+run-time.  To help facilitate this, there are 2 commands.
 
 *** require_remote
-Part of opal-parser, =require_remote= allows you require a remote ruby file.
+Part of *opal-parser*, =require_remote= allows you require a remote ruby file.
 
 #+BEGIN_SRC ruby
 require_remote <url_to_ruby_file>"
@@ -249,7 +253,7 @@ out "require_remote is cool" 10 times.
 
 
 #+ATTR_HTML: :target "_blank"
-You can try this [[http://git.io/vOmoR][directly here]] if the embedded iframe below doesn't look right
+You can try this [[http://git.io/vOmoR][from here]] if the embedded iframe below doesn't look right
 #+BEGIN_HTML
 <iframe width="100%" height="500" src="http://git.io/vOmoR" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
@@ -287,8 +291,8 @@ You can try this [[http://git.io/vOmDg][directly here]] if the embedded iframe b
 #+END_HTML
 
 ** Say, say, say, what you want...
-On osx, I make lots of use of the built in say command. For example,
-have a function that copies over the production database, loads it
+On *osx*, I make lots of use of the built-in =say= command. For example,
+I have a function that copies over the production database and loads it
 into a designated database.  The data is not small and this can take a
 while, so the function lets me know what step it's doing. This allows
 me to do other work while it's happening.  So even if my terminal
@@ -296,7 +300,7 @@ window is obscured, I'll know when the job is done the moment it
 happens.
 
 This might be a novelty in the browser, but I decided to implement
-that for opal-irb.  I'll likely make it a full fledged gem in the
+that for opal-irb.  I'll likely make it a full-fledged gem in the
 future.
 
 #+ATTR_HTML: :target "_blank"
@@ -325,19 +329,19 @@ http://fkchang.github.io/opal-irb/index-homebrew.html
 
 #+ATTR_HTML: :target "_blank"
 This was my 1st attempt, port of a [[https://github.com/larryng/coffeescript-repl][coffescript repl]] with hand written
-terminal code.  It's not as full featured as:
+terminal code.  It's not as full featured as the following **jq-console example**:
 
-** jq-console console example
+** jq-console Example
 #+ATTR_HTML: :target "_blank"
 http://fkchang.github.io/opal-irb/index-jq.html
 #+BEGIN_HTML
 <iframe width="100%" height="500" src="http://fkchang.github.io/opal-irb/index-jq.html" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
-This uses (a fork of) jq-console, for improved console support.  Most
-of my development has been on a jq-console based opal-irb, though I
-might revisit a port of jq-console because I'd like to remove the
-jquery dependency in opal-irb
+This uses (a fork of) =jq-console=, for improved console support.  Most
+of my development has been on a =jq-console= based *opal-irb*, though I
+might revisit a =jq-console= port because I'd like to remove the
+*jquery* dependency in *opal-irb*
 
 ** Embedded console example
 #+ATTR_HTML: :target "_blank"
@@ -346,11 +350,12 @@ http://fkchang.github.io/opal-irb/index-embeddable.html
 <iframe width="100%" height="700" src="http://fkchang.github.io/opal-irb/index-embeddable.html" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
-This example is closer to how I see opal-irb being used in real apps -
-where opal-irb is embedded with in the app/page itself.  This example
-sports some nominal DOM elements that are there to manipulate and a
-button to show the irb panel if it's been closed.  Opal-irb supports 2
+This example is closer to how I see *opal-irb* being used in real apps -
+where *opal-irb* is embedded with in the app/page itself.  This example
+shows manipulating some nominal DOM elements and a
+button to show the *irb* panel if it's been closed.  *Opal-irb* supports 2
 ways to invoke a hidden opal-irb:
+
 - hot key
 - click event on a DOM element
 
@@ -364,22 +369,22 @@ http://fkchang.github.io/opal-playground/
 <iframe width="100%" height="800" src="http://fkchang.github.io/opal-playground/" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
-Opal-irb has been embedded into my fork of the
-opal-playground. Opal-irb is available in the RESULTS section by
+*Opal-irb* has been embedded into my fork of the
+*opal-playground*. *Opal-irb* is available in the RESULTS section by
 hitting the blue "Show Irb" button.  I am hoping to take the
-opal-playground direction more towards opal-inspector, but there are
+opal-playground direction more towards *opal-inspector*, but there are
 times you want to use a REPL in addition to just editing the code, and
 this provides that.
 
 ** And much more
 #+ATTR_HTML: :target "_blank"
-I demo a good number of these opal-irb features at this point in my [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D1838][RubyConf 2013
-talk "Opal - A New Hope"]] this may be easier to digest than the written word.
+I demo a good number of these opal-irb features in my [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D1838][RubyConf 2013
+talk "Opal - A New Hope"]]; this may be easier to digest than the written word.
 
 I also made a [[https://www.youtube.com/watch?v%3DmQTulgBm5Nk][video]] for the in progress auto complete in the console.
 
 #+ATTR_HTML: :target "_blank"
 This is just the beginning of much more with regard to in browser opal
 tools.  I [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D2099][previewed]] a prototype of opal-inspector 2 years back, and I
-intend on bringing features previously only supported in smalltalk and
-lisp machines for Ruby browser.
+intend on bringing features previously only supported in Smalltalk and
+Lisp machines.
