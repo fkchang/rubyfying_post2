@@ -70,7 +70,11 @@ STDERR STDIN  STDOUT
 #+END_SRC
 
 #+BEGIN_SRC
-opal> STD
+opal> STDI<tab>
+#+END_SRC
+
+#+BEGIN_SRC
+opal> STDIN
 #+END_SRC
 
 ** Multi Line Input
@@ -184,7 +188,7 @@ condition for a coworker to debug.
 The various embedded opal-irb's on this page are all done via "live gist."
 
 ** Enhanced History
-*** History Command-like Shell
+*** History Command (like shells have, bash, etc.)
 You can type =history= at the prompt to get a listing of your history.
 You will get a listing of the code you've typed in including line
 numbers.
@@ -350,11 +354,12 @@ http://fkchang.github.io/opal-irb/index-embeddable.html
 <iframe width="100%" height="700" src="http://fkchang.github.io/opal-irb/index-embeddable.html" frameborder="0" allowfullscreen></iframe>
 #+END_HTML
 
-This example is closer to how I see *opal-irb* being used in real apps -
-where *opal-irb* is embedded with in the app/page itself.  This example
-shows manipulating some nominal DOM elements and a
-button to show the *irb* panel if it's been closed.  *Opal-irb* supports 2
-ways to invoke a hidden opal-irb:
+This example is closer to how I see *opal-irb* being used in real
+apps - where *opal-irb* is embedded with in the app/page itself.  This
+example shows some nominal DOM elements, there for the purpose of
+providing DOM elements to manipulate with opal, and a button to show
+the *irb* panel if it's been closed.  *Opal-irb* supports 2 ways to
+invoke a hidden opal-irb:
 
 - hot key
 - click event on a DOM element
@@ -388,3 +393,5 @@ This is just the beginning of much more with regard to in browser opal
 tools.  I [[https://www.youtube.com/watch?feature%3Dplayer_detailpage&v%3DGH9FAfKG-qY#t%3D2099][previewed]] a prototype of opal-inspector 2 years back, and I
 intend on bringing features previously only supported in Smalltalk and
 Lisp machines.
+
+Thanks to [[http://blog.scottnelsonsmith.com][Scott Smith]] for proofreading this.
