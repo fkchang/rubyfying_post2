@@ -304,8 +304,7 @@ class HomeController < ApplicationController
 end
 #+END_SRC
 
-Browsing http://localhost:3000/home/search_path rendered
-is =Components::Home::Top=.
+Browsing http://localhost:3000/home/search_path rendered =Components::Home::Top=.
 
 Specifying the component by name, yields the same result =Components::Home::Top=
 #+BEGIN_SRC ruby
