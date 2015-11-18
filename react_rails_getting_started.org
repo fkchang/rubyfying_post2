@@ -408,5 +408,6 @@ react.js, so the components are react.js components.
 
 
 * That's all for now.
-
-This should be enough to get one started.   Follow on react.rb articles to follow.  Enjoy react.rb and Rails!
+All this code exists in a rails project [[https://github.com/fkchang/getting-started-react-rails][here.]] This should be enough to
+get one started.  Follow on react.rb articles to follow.  Enjoy
+react.rb and Rails!
