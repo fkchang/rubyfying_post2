@@ -1,5 +1,6 @@
 #+OPTIONS: num:nil toc:nil
 
+* Getting started with react.rb and Rails
 #+ATTR_HTML: :target "_blank"
 #+ATTR_HTML: :target "_blank"
 As a Ruby web developer, you should be aware that [[http://facebook.github.io/react/][react.js]] is hot on
@@ -173,7 +174,7 @@ By default it prerenders on the server, but you can force Rails to not
 prerender by appending ?no_prerender=1 to the url, like so
 
 #+BEGIN_SRC bash
-http://localhost:3000/home/index?no_prerender=1
+http://localhost:3000/home/isomorphic?no_prerender=1
 #+END_SRC
 
 Let's take a quick look on what gets returned by the server (formatted to look better)
@@ -232,6 +233,8 @@ class HomeController < ApplicationController
 end
 
 #+END_SRC
+
+Browsing http://localhost:3000/home/iso_convention will render the Components::IsoConvention component
 
 * The search path
 
@@ -321,7 +324,7 @@ end
 #+END_SRC
 
 Hitting http://localhost:3000/home/search_path the component rendered
-is =Components::Home::Top=.
+=Home::SearchPath=.
 
 
 Specifying the component by name, yields the same result =Components::Home::Top=
@@ -333,36 +336,24 @@ class HomeController < ApplicationController
 end
 #+END_SRC
 
-****I want to note this is what I expect to happen, and sometimes it happens, sometimes the components get resolved differently - asking Mitch about it ****
+We can explore the search path by changing the found component's name
+to SearchPath1, and then refreshing
+http://localhost:3000/home/search_path to see which component is
+found.  If we do this for each component found,k we get the following
+results:
 
-* Order restarting each time, not quite expected, usually get this order
 | Class name changed from SearchPath | Component Rendered           |
 |------------------------------------+------------------------------|
 | none                               | Home::SearchPath             |
-| Home::SearchPath                   | ::SearchPath                 |
-| ::SearchPath                       | Components::Home::SearchPath |
+| Home::SearchPath                   | Components::Home::SearchPath |
+| ::SearchPath                       | ::SearchPath                 |
 | Components::Home::SearchPath       | Components::SearchPath       |
 |                                    |                              |
 
 
-* Order I expected, that I got a few times - can't presently duplicate
-| Class name changed from SearchPath | Component Rendered           |
-|------------------------------------+------------------------------|
-| none                               | Components::Home::SearchPath |
-| Components::Home::SearchPath       | Components::SearchPath       |
-| Components::SearchPath             | Home::SearchPath             |
-| Home::SearchPath                   | ::SearchPath                 |
-|                                    |                              |
-
-
-
-So let's change the name of =Components::Home::Top= to Top1 and refresh,
-the component rendered is =Components::Top=, if we change
-=Components::Top='s name to Top1 the component rendered is =Home::Top=.
-If we rename Home::Top to Top1 we finally get =::Top=
-
-If we rename all the =Top1= classes back to =Top=, we can force the
-search path in the =render_component()= call
+If we rename all the =SearchPath1= classes back to =SearchPath=, we
+can force the search path to find our desired component by specifying
+the full namespace in the =render_component()= call
 
 #+BEGIN_SRC ruby
 class HomeController < ApplicationController
