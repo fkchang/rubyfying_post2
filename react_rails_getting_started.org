@@ -302,7 +302,7 @@ end
 
 module Components
   module Home
-    class SearchPath1
+    class SearchPath
       include React::Component
       def render
         h2 { 'Components::Home::SearchPath' }
