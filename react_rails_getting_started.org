@@ -17,7 +17,8 @@ let's get react.rb up and running on Rails.
 * Generate a rails project with opal
 
 #+ATTR_HTML: :target "_blank"
-The easiest way to create a rails project that uses [[http://opalrb.org][Opal]] is use the --javascript=opal option.
+The easiest way to create a rails project that uses [[http://opalrb.org][Opal]]
+ is use the --javascript=opal option.
 
 #+BEGIN_SRC bash
 % rails new getting-started-react-rails --javascript=opal
@@ -274,7 +275,7 @@ how the search path resolves which component to use.  Create the 2 files below
   # This class departs from 1 class/file and diretory
   # strctureconvention, using this to test search path
 
-class SearchPath1
+class SearchPath
   include React::Component
   def render
     h1 {"::SearchPath"}
@@ -282,7 +283,7 @@ class SearchPath1
 end
 
 module Home
-  class SearchPath1
+  class SearchPath
     include React::Component
     def render
       h1 {"Home::SearchPath"}
@@ -346,9 +347,9 @@ results:
 |------------------------------------+------------------------------|
 | none                               | Home::SearchPath             |
 | Home::SearchPath                   | Components::Home::SearchPath |
-| ::SearchPath                       | ::SearchPath                 |
-| Components::Home::SearchPath       | Components::SearchPath       |
-|                                    |                              |
+| Components::Home::SearchPath       | ::SearchPath                 |
+| ::SearchPath                       | Components::SearchPath       |
+
 
 
 If we rename all the =SearchPath1= classes back to =SearchPath=, we
