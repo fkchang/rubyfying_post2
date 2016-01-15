@@ -1,53 +1,65 @@
 #+OPTIONS: num:nil toc:nil
 
+* Getting started with react.rb and Rails
 #+ATTR_HTML: :target "_blank"
 #+ATTR_HTML: :target "_blank"
-
-* Getting Started with React and Rails
-
-As a Ruby web developer, you are probably already aware that [[http://facebook.github.io/react/][react.js]] is hot on
-the front end. Official *react.js* support in Rails is provided by
-Facebook via the [[https://github.com/reactjs/react-rails][react-rails]] gem.
-
-#+ATTR_HTML: :target "_blank"
-[[https://github.com/zetachang/react.rb#changing-the-top-level-component-name-and-search-path][React.rb/reactive-ruby]] (henceforth *react.rb*) gives you more Ruby joy
-by allowing you to write react components in Ruby, courtesy of [[http://opalrb.org][Opal]]
-
-I will write in depth about react.rb in subsequent posts, but now
-let's get *react.rb* up and running on Rails.
-
-** Generate a rails project with opal
+Looking back, [[Http://facebook.github.io/react/][React.js]] was the hottest Javascript framework
+of 2015. Bringing this goodness to Ruby on Rails is [[https://github.com/reactjs/react-rails][react-rails]] gem,
+provided by the reactjs team.  From the project page, React-rails
+can:
+- Provide various react builds to your asset bundle
+- Transform .jsx in the asset pipeline
+- Render components into views and mount them via view helper & react_ujs
+- Render components server-side with prerender: true
+- Generate components with a Rails generator
+- Be extended with custom renderers, transformers and view helpers
 
 #+ATTR_HTML: :target "_blank"
+While this provides easy integration with Rails, a Rails developer
+cannot leverage the full benefits of React.js, which includes
+isomorphic/[[https://medium.com/@mjackson/universal-javascript-4761051b7ae9#.rxrgqe5wb][universal]] domain logic code and views, due to different
+languages being used on server and client
+sides. [[https://github.com/zetachang/react.rb#changing-the-top-level-component-name-and-search-path][React.rb/reactive-ruby]] (react.rb from here on) allows you to
+write React components in Ruby, courtesy of [[http://opalrb.org][Opal]].  Server side
+rendering of react.rb components is also supported, providing Rails programmer
+universal domain logic and views written in Ruby.
 
-Create a rails project using [[http://opalrb.org][Opal]]:
+I will write in depth about react.rb in subsequent posts. Let's get
+react.rb up and running on Rails from scratch.
+
+* Step 1: Generate a rails project that uses Opal
+
+#+ATTR_HTML: :target "_blank"
+The easiest way to create a Rails project that uses [[http://opalrb.org][Opal]] is use the
+=--javascript=opal= option. Manual instructions are given on the
+[[https://github.com/opal/opal-rails][opal-rails]] site.
 
 #+BEGIN_SRC bash
 % rails new getting-started-react-rails --javascript=opal
 #+END_SRC
 
-** Add react.rb gems to Gemfile
+* Add react.rb gems to Gemfile
+
+To use react.rb, you will need to add 3 gems to be added to your Gemfile:
+reactive-ruby[fn:gem_names], react-rails and therubyracer
 
 #+BEGIN_SRC ruby
 gem 'reactive-ruby', '0.7.28' # nail down compatible version w/ react-rails
-gem 'react-rails', '1.3.2' # not compatible ith 1.4.* yet
+gem 'react-rails', '1.3.2' # react.rb not compatible ith 1.4.* yet so use this one
 gem 'opal-rails' # already added w/the --javascript=opal option
 gem 'therubyracer', platforms: :ruby # Required for prerendering
 #+END_SRC
 
-Then run =bundle install=
+Run =bundle install= after these have been added to your Gemfile.
 
-** Configure application.rb
+* Convert application.js to application.rb
 
-Starting with *Opal 0.8.**, we no longer need to configure =application.js=;
-we can instead use =require= statements in =application.rb=.
+When using opal-rails, it is recommented[fn:opal_rails_recommendation]
+to convert the application.js file to application.rb.  Make yours look
+like this:
 
-1.  Remove =application.rb=
-#+BEGIN_SRC bash
-% rm app/assets/javascripts/application.js
-#+END_SRC
-1.  [@2] Copy the following text into =app/assets/javascripts/application.rb=:
 #+BEGIN_SRC ruby
+# app/assets/javascripts/application.rb
 require 'opal'
 require 'opal_ujs'
 require 'turbolinks'
@@ -57,79 +69,68 @@ require 'components' # to include isomorphic react components on the client
 require_tree '.'
 #+END_SRC
 
-** Setup for isomorphic React components
+* Setup for isomorphic React components
 
 #+ATTR_HTML: :target "_blank"
 #+ATTR_HTML: :target "_blank"
-A big perk of *react.js* is /isomorphic code/ (same code on server and
-client) which leads to a unified UI layer. [[https://github.com/reactjs/react-rails][react-rails]] gives you
-convenient *react.js* integration with Rails, including server-rendered
-components and other goodies as detailed in this [[http://bensmithett.com/server-rendered-react-components-in-rails/][article]].  *react.rb*
-extends these advantages to give you isomorphic code in Ruby!  I like this
-quote from the afore-linked article.
+A big perk of react.js is isomorphic code (same code on server and
+client side), which leads to A unified UI layer. As mentioned before
+[[https://github.com/reactjs/react-rails][react-rails]] provides server rendered react components and other perks as detailed in
+this [[http://bensmithett.com/server-rendered-react-components-in-rails/][this article]].  It's a pretty big per, per this quote from the aforementioned article.
 
 #+BEGIN_QUOTE
-/The Holy Grail. The united UI layer. Serve up real HTML on first page load,
-then kick off a client side JS app. All without duplicating a single line of UI code./
+The Holy Grail. The united UI layer. Serve up real HTML on first page load, then kick off a client side JS app. All without duplicating a single line of UI code.
 #+END_QUOTE
 
-To support isomorphic *react.rb* components you will need to setup a
-structure to /share/ these components:
+Those who have struggled with duplicated views on front and back in
+different languages should appreciate that sentiment. To support
+isomorphic react.rb components you will need to setup a structure for
+these *shared* components. The current convention is to make a
+=app/views/components= directory that will hold the components and a
+=components.rb= manifest file that will require all the *shared*
+components, like so.
 
-
-1. Make an =app/views/components= directory to hold the components.
-#+BEGIN_SRC bash
-%  mkdir app/views/components
-#+END_SRC
-1. [@2] Create a text file, =app/views/components.rb=, with the following contents:
 #+BEGIN_SRC ruby
+# app/views/components.rb
 require 'opal'
 require 'reactive-ruby'
 require_tree './components'
 #+END_SRC
 
-You will have noticed that while converting to =application.rb=, I
-=require='d this =components.rb= file to allow these isomorphic
-components to be be included on the client side.
+You will have noticed that the =application.rb=, I
+=require=s this =components.rb= file to allow these isomorphic
+components to be compiled.
 
-** Creating client side only react components
-
-It should go without saying that you can create /client-only/ *react.rb*
-components without any setup.  The opal files you write will be found
-by Rails anywhere that the asset pipeline loads javascript files, but
-I would recommend a structure similar to how *react-rails* sets up the
-structure for react.js components -- in the directory
-=app/assets/javascripts/components=
-
-We will address client only components later in the article
-
-** Make a controller to demonstrate react components
+* Make a controller to demonstrate react components
 
 We will be covering several types of components, let's make a
-controller to display them:
+dedicated controller to display these with actions for each case.
 
 #+BEGIN_SRC bash
 % rails g controller home isomorphic iso_convention search_path client_only
 #+END_SRC
 
-** Create your first React Component
+* Create your first React Component
 
 So now that we're setup for isomorphic components, lets make our first
-*react.rb* component.  We'll start with a simple "Hello World" component.
-This component renders a single, required param (/prop/ in
-*react.js* lingo) message of type =String= in an =h1=
-element, along with a button that runs =alert()= with the
-same message
+react.rb component.  We'll start with a simple "Hello World" type of
+component nature. This component takes a single, required param (prop
+in react.js lingo, param was chosen to make it familiar for Rails
+programmers ) message of type string. The component renders this
+message in an h1 element, and renders a button that when clicked on
+calls =alert()= with the same message.
 
-Put the following text in this file: =app/views/components/hello.rb=
+Put the below in this file app/views/components/hello.rb
 
 #+BEGIN_SRC ruby
 class Hello
   include React::Component
-  required_param :message, type: String
+  required_param :what, type: String
+
   def message
     "Hello #{what}"
   end
+
   def render
     div {
       h1 { message }
@@ -139,7 +140,10 @@ class Hello
 end
 #+END_SRC
 
-Use =render_component" to render the =Hello= component in your controller:
+You can render the =Hello= component in your controller with
+=render_component()=. =render_component()= takes an optional (more on
+this later) name of the component and any parameters you wish to pass
+the component.  Fill in the =isomorphic= action in the =HomeController= like so
 
 #+BEGIN_SRC ruby
 class HomeController < ApplicationController
@@ -149,23 +153,17 @@ class HomeController < ApplicationController
 end
 #+END_SRC
 
-You can see that =render_component= takes two arguments:
-
-1.  A string identifying the react component, 'Hello'.
-1.  An optional key/value pair containing parameters.  Here, we pass the
-    require parameter =:message= along with its value.
-
 Start the server, then visit http://localhost:3000/home/isomorphic to view the component.
 By default it prerenders on the server, but you can force Rails to not
-prerender by appending =?no_prerender=1= to the url, like so
+prerender by appending ?no_prerender=1 to the url, like so
 
 #+BEGIN_SRC bash
-http://localhost:3000/home/index?no_prerender=1
+http://localhost:3000/home/isomorphic?no_prerender=1
 #+END_SRC
 
-Let's take a quick look on what gets returned by the server (formatted to look better)
+Let's take a quick look on what gets returned by the server (formatted to be more human readable)
 
-For http://localhost:3000/home/isomorphic we see the `<h1>` and button rendered from the server
+For http://localhost:3000/home/isomorphic we see the h1 and button rendered from the server
 #+BEGIN_SRC html
   <div data-react-class="React.TopLevelRailsComponent"
        data-react-props="{&quot;render_params&quot;:{&quot;message&quot;:&quot;World&quot;},&quot;component_name&quot;:&quot;Hello&quot;,&quot;controller&quot;:&quot;Home&quot;}">
@@ -184,72 +182,75 @@ For http://localhost:3000/home/isomorphic?no_prerender=1 there is no prerenderin
   </div>
 #+END_SRC
 
-** Rails conventions and isomorphic components
+* Rails conventions, isomorphic components and the default component
 
-In the Rails tradition of "convention over configuration", you can
-organize your components to assign a
-"default" component for that controller.  For example, you can
-assign component =#iso_convention= to =HomeController= as follows:
+In the Rails tradition of convention over configuration, you can
+structure your components to match your controllers to support a
+"default" component for controller action. To make a default component
+for the =HomeController#iso_convention= action create the below file:
 
-1.  Create the component directory for the =HomeController=:
-#+BEGIN_SRC bash
-% mkdir app/views/components/home
-#+END_SRC
-1.  [@2] Place the following code into
-    =app/views/components/home/iso_convention.rb=
 #+BEGIN_SRC ruby
+# app/views/components/home/iso_convention.rb
   module Components
-    class IsoConvention
-      include React::Component
+    module Home
+      class IsoConvention
+        include React::Component
 
-      def render
-        h1 { "the message is: #{params[:message]}" }
+        def render
+          h1 { "the message is: #{params[:message]}" }
+        end
       end
     end
   end
 #+END_SRC
 
-We now call =render_component()= with only the params in the
-controller's action.  The *default* component gets called.
-
+We now call =render_component()= in the action, passing only the
+component params in the action.  =render_component()= will instantiate
+the *default* component.
 #+BEGIN_SRC ruby
 class HomeController < ApplicationController
   def iso_convention
     render_component message: 'World'
   end
 end
+
 #+END_SRC
 
-** The search path
+Browsing http://localhost:3000/home/iso_convention will render the Components::IsoConvention component
 
-  Where possible, you should stick with the conventions, but there are
-  times where you will not, for example, with shared components.  The
-  search path for isomorphic components is described [[https://github.com/zetachang/react.rb#changing-the-top-level-component-name-and-search-path][here]] which says
+* The component search path
+
+  For consistency with Rails you should stick with the directory and
+  filename conventions. There is some flexibility in where you can
+  place components. The search path for isomorphic components is
+  described [[https://github.com/zetachang/react.rb#changing-the-top-level-component-name-and-search-path][here]] which writes:
 
 #+BEGIN_QUOTE
 Changing the top level component name and search path
 
-You can control the top level component name and search path.
+   You can control the top level component name and search path.
 
-You can specify the component name explicitly in the
-render_component method. render_component "Blatz" will search the
-path for a component class named =Blatz= regardless of the controller
-method.
+   You can specify the component name explicitly in the
+   render_component method. render_component "Blatz will search the
+   for a component class named Blatz regardless of the controller
+   method.
 
-Searching for components normally works like this: Given a
-controller named "Foo", then the component should be either in the
-=Components::Foo= module, the =Components= module (no controller -
-useful if you have just a couple of shared components) or just the
-outer scope (i.e. =Module=) which is useful for small apps.
+   Searching for components normally works like this: Given a
+   controller named "Foo" then the component should be either in the
+   Components::Foo module, the Components module (no controller -
+   useful if you have just a couple of shared components) or just the
+   outer scope (i.e. Module) which is useful for small apps.
 
-Saying "render_component '::Blatz'" will only search the outer scope,
-while ~::Foo::Blatz~ will look only in the module ~Foo~ for a class
-named ~Blatz~.
+   Saying render_component "::Blatz" will only search the outer scope,
+   while "::Foo::Blatz" will look only in the module Foo for a class
+   named Blatz.
 #+END_QUOTE
 
-** Playing around with the search path
-Let's play around with several components with the same name and see
-how the search path resolves which component to use.  Create the 2 files below
+* Playing around with the search path
+Let's play around with several components with the same class name and
+see how the search path resolves which component to use.  Create the 2
+files below
+
 
 =app/views/components/search_path.rb=
 #+BEGIN_SRC ruby
@@ -257,7 +258,7 @@ how the search path resolves which component to use.  Create the 2 files below
   # This class departs from 1 class/file and diretory
   # strctureconvention, using this to test search path
 
-class SearchPath1
+class SearchPath
   include React::Component
   def render
     h1 {"::SearchPath"}
@@ -265,7 +266,7 @@ class SearchPath1
 end
 
 module Home
-  class SearchPath1
+  class SearchPath
     include React::Component
     def render
       h1 {"Home::SearchPath"}
@@ -284,7 +285,7 @@ end
 
 module Components
   module Home
-    class SearchPath1
+    class SearchPath
       include React::Component
       def render
         h2 { 'Components::Home::SearchPath' }
@@ -292,9 +293,11 @@ module Components
     end
   end
 end
+
 #+END_SRC
 
-For ~HomeController~ to render the "default" component, call =render_component()=.
+
+To get the "default" component, we can just call =render_component()=.
 
 #+BEGIN_SRC ruby
 class HomeController < ApplicationController
@@ -304,7 +307,9 @@ class HomeController < ApplicationController
 end
 #+END_SRC
 
-Browsing http://localhost:3000/home/search_path rendered =Components::Home::Top=.
+Hitting http://localhost:3000/home/search_path the component rendered
+=Home::SearchPath=.
+
 
 Specifying the component by name, yields the same result =Components::Home::Top=
 #+BEGIN_SRC ruby
@@ -315,35 +320,24 @@ class HomeController < ApplicationController
 end
 #+END_SRC
 
-#+BEGIN_QUOTE
-/I want to note this is what I expect to happen, and sometimes it happens, sometimes the components get resolved differently - asking Mitch about it./
-#+END_QUOTE
+We can explore the search path by changing the found component's name
+to SearchPath1, and then refreshing
+http://localhost:3000/home/search_path to see which component is
+found.  If we do this for each component found, we get the following
+results:
 
-*** Order restarting each time, not quite expected, usually get this order
 | Class name changed from SearchPath | Component Rendered           |
 |------------------------------------+------------------------------|
 | none                               | Home::SearchPath             |
-| Home::SearchPath                   | ::SearchPath                 |
-| ::SearchPath                       | Components::Home::SearchPath |
-| Components::Home::SearchPath       | Components::SearchPath       |
-|                                    |                              |
+| Home::SearchPath                   | Components::Home::SearchPath |
+| Components::Home::SearchPath       | ::SearchPath                 |
+| ::SearchPath                       | Components::SearchPath       |
 
-*** Order I expected, that I got a few times - can't presently duplicate
-| Class name changed from SearchPath | Component Rendered           |
-|------------------------------------+------------------------------|
-| none                               | Components::Home::SearchPath |
-| Components::Home::SearchPath       | Components::SearchPath       |
-| Components::SearchPath             | Home::SearchPath             |
-| Home::SearchPath                   | ::SearchPath                 |
-|                                    |                              |
 
-So let's change the name of =Components::Home::Top= to =Top1= and refresh,
-the component rendered is =Components::Top=, if we change
-=Components::Top='s name to ~Top1~ the component rendered is =Home::Top=.
-If we rename ~Home::Top~ to ~Top1~ we finally get =::Top=
 
-If we rename all the =Top1= classes back to =Top=, we can force the
-search path in the =render_component()= call
+If we rename all the =SearchPath1= classes back to =SearchPath=, we
+can force the search path to find our desired component by specifying
+the full namespace in the =render_component()= call
 
 #+BEGIN_SRC ruby
 class HomeController < ApplicationController
@@ -357,18 +351,37 @@ class HomeController < ApplicationController
 end
 #+END_SRC
 
-*** Client side only component
-If you want to make client only components, to follow conventions with
-*react-rails*, make a =components= subdirectory in
-=app/views/javascripts= and put them there. Like so:
+* Conventions for react-rails, Opal and react.rb
 
-1.  Make the directory:
-#+BEGIN_SRC bash
-% mkdir app/assets/javascripts/components
-#+END_SRC
-1.  [@2] Create =app/assets/javascripts/components/client_only.rb=
-    with the following contents:
+The react-rails Javascript component generators create react.js
+components in the =app/assets/javascripts/components= directory.  This
+makes sense, esp. in light that Rails out of the box does NOT support
+isomorphic code and views, so this is a logical, and Rails like place
+for them to go.  Similarly, if you are just using opal-rails and not
+not react.rb, then by convention, your opal code will be placed under
+=app/assets/javascripts= where the asset pipeline knows how to find
+and transpile those to javascript.  React.rb challenges these
+conventions with code that runs.  As react.js is often called the V of
+MVC, then with react.rb it makes sense for react.rb components to live
+under the =app/views/components= directory as they can also be
+rendered on the server.  React.rb is young, and conventions may
+change, but at the momemnt this is where they live
+
+You can create react.rb components more in line with react-rails and
+opal conventions, by placing them under the =app/assets/javascripts=
+directory. The Opal files will be found by Rails anywhere that the
+asset pipeline is configured to javascript files for both server and
+client, but I would recommend a structure similar to how react-rails
+sets up the structure for react.js components -- in the directory
+=app/assets/javascripts/components= to make them easy to find
+
+Let's make the "client side only" component under
+=app/assets/javascripts=. Since Opal will find the file anywhere the
+asset pipeline knows to look, this would be more for organizational
+purposes rather than a required configuration.
+
 #+BEGIN_SRC ruby
+# app/assets/javascripts/components/client_only.rb
 class ClientOnly
   include React::Component
   required_param :message, type: String
@@ -380,9 +393,9 @@ end
 #+END_SRC
 
 Then in the template for the =client_only= action , you can render the
-component client side via the =react_component()= method provided by
-*react-rails*. This works because *react.rb* wraps calls to
-*react.js*, so the components are *react.js* components:
+component client side via the =react_component()= view helper provided by
+react-rails. This works because Since react.rb wraps calls to
+react.js, so the components are react.js components.
 
 #+BEGIN_SRC html
 <h1>Home#client_only</h1>
@@ -390,7 +403,29 @@ component client side via the =react_component()= method provided by
 <%= react_component 'ClientOnly', message: 'World' %>
 #+END_SRC
 
-** That's all for now.
-All this code exists in a rails project [[https://github.com/fkchang/getting-started-react-rails][here.]] This should be enough to
-get one started.  Follow-on *react.rb* articles to follow.  Enjoy
-*react.rb* and Rails!
+
+* That's all for now.
+So now you have a Rails project with react.rb running. All this code
+exists in a rails project [[https://github.com/fkchang/getting-started-react-rails][here.]] This should be enough to get one
+started.  Follow on react.rb articles to follow.  Enjoy react.rb and
+Rails!
+
+* Footnotes
+
+[fn:gem_names] reactive-ruby will fold back into react.rb with the 0.9.0 versions (currently at 0.7.36).  Plans are discussed in the react.rb [[https://github.com/zetachang/react.rb#road-map][roadmap]]
+
+[fn:opal_rails_recommendation]
+A change was made starting with Opal 0.8.*, to support ordered
+requires. If one wishes to continue to use application.js instead
+application.rb, one needs to manually load each opal file in the
+application.js, as below.  Use of application.rb will automatically load the files in question
+
+#+BEGIN_SRC javascript
+// application.js
+//= require opal
+//= require greeter
+//= require_self
+Opal.load('an_opal_file');
+Opal.load('another_opal_file');
+// etc.
+#+END_SRC
