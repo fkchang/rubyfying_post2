@@ -375,11 +375,10 @@ client, but I would recommend a structure similar to how react-rails
 sets up the structure for react.js components -- in the directory
 =app/assets/javascripts/components= to make them easy to find
 
-
-* Client side only component
-If you want to make client only components, to follow conventions with
-react-rails, make a =components= subdirectory in
-=app/views/javascripts= and put them there. Like so:
+Let's make the "client side only" component under
+=app/assets/javascripts=. Since Opal will find the file anywhere the
+asset pipeline knows to look, this would be more for organizational
+purposes rather than a required configuration.
 
 #+BEGIN_SRC ruby
 # app/assets/javascripts/components/client_only.rb
