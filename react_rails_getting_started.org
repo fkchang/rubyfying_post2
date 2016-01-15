@@ -410,9 +410,9 @@ exists in a rails project [[https://github.com/fkchang/getting-started-react-rai
 started.  Follow on react.rb articles to follow.  Enjoy react.rb and
 Rails!
 
-[fn:gem_names] reactive-ruby will fold back into react.rb with the 0.9.0 versions (currently at 0.7.36).  Plans are discussed in the react.rb [[https://github.com/zetachang/react.rb#road-map][roadmap]]
-
 * Footnotes
+
+[fn:gem_names] reactive-ruby will fold back into react.rb with the 0.9.0 versions (currently at 0.7.36).  Plans are discussed in the react.rb [[https://github.com/zetachang/react.rb#road-map][roadmap]]
 
 [fn:opal_rails_recommendation]
 A change was made starting with Opal 0.8.*, to support ordered
