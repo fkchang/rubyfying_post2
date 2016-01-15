@@ -351,7 +351,7 @@ class HomeController < ApplicationController
 end
 #+END_SRC
 
-* react-rails, Opal conventions, react.rb
+* Conventions for react-rails, Opal and react.rb
 
 The react-rails Javascript component generators create react.js
 components in the =app/assets/javascripts/components= directory.  This
