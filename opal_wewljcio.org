@@ -1,5 +1,5 @@
 #+OPTIONS: toc:nil num:nil
-* WEWLJCIO - Working Effectgively with Legacy Javascript Code in Opal
+* WEWLJCIO - Working Effectively with Legacy Javascript Code in Opal
 
 I've been working on [[https://github.com/fkchang/opal-hot-reloader][opal-hot-reloader]], a hot reloader for [[http://opalrb.org][Opal]]
 applications including [[http://reactrb.org][built in react.rb]] support.  I merged a pull
