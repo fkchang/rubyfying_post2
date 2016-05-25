@@ -1,0 +1,419 @@
+* WEWLJCIO - Working Effectgively with Legacy Javascript Code in Opal
+
+I've been working on [[https://github.com/fkchang/opal-hot-reloader][opal-hot-reloader]], a hot reloader for opal
+applications including [[http://reactrb.org][built in react.rb]] support.  I merged a pull
+request (thanks Brock!) that added hot css reloading. The code works,
+but is both primarily in Javascript and did not have tests.  To make
+it easier to read, maintain and extend I want to both add tests and
+convert it to Opal.  In particular, I want to extend the code to
+handle css served by the [[http://rubyonrails.org][Ruby on Rails]] pipeline.
+
+Now this sounds a bit like [[http://c2.com/cgi/wiki?WorkingEffectivelyWithLegacyCode][Working Effectively With Legacy Code]] by
+Michael Feathers, it is, and thus the title.  We do a slightly
+different case of needing to convert languages, and the interface
+between those 2 languages and predefined browser API, so hopefully
+this brings some different insights.
+
+* Where to start?
+
+Let's look at the code.  An additional if clause was added to
+~OpalHotReloader#reload()~ that performs the css hot reloading on the
+client side. It's mostly implemented in Javascript via an Opal x-string.
+
+#+BEGIN_SRC ruby
+  def reload(e)
+    # original code
+    reload_request = JSON.parse(`e.data`)
+    if reload_request[:type] == "ruby"
+      puts "Reloading ruby #{reload_request[:filename]}"
+      eval reload_request[:source_code]
+      if @reload_post_callback
+        @reload_post_callback.call
+      else
+        puts "not reloading code"
+      end
+    end
+    # the new css hot reloading code
+    if reload_request[:type] == "css"
+         if reload_request[:type] == "css"
+      url = reload_request[:url]
+      puts "Reloading CSS: #{url}"
+      # Work outsources Javascript via x-string
+      %x{
+        var toAppend = "t_hot_reload=" + (new Date()).getTime();
+        var links = document.getElementsByTagName("link");
+        for (var i = 0; i < links.length; i++) {
+          var link = links[i];
+          if (link.rel === "stylesheet" && link.href.indexOf(#{url}) >= 0) {
+            if (link.href.indexOf("?") === -1) {
+              link.href += "?" + toAppend;
+            } else {
+              if (link.href.indexOf("t_hot_reload") === -1) {
+                link.href += "&" + toAppend;
+              } else {
+                link.href = link.href.replace(/t_hot_reload=\d{13}/, toAppend)
+              }
+            }
+          }
+        }
+      }
+
+    endx
+  end
+
+#+END_SRC
+
+* First steps
+
+The first thing I notices is a formerly smallish method is not quite
+large.  I'll want to refactor that code out the body of the ~reload()~
+method as a method of a new class, ~OpalHotReloader::CssReloader~
+dedicated to just css hot reloading ([[https://en.wikipedia.org/wiki/Single_responsibility_principle][SRP]]).  In this case, we'll
+instantiate this class instance as @css_reloader in the initializer
+for ~OpalHotReloader~ then delegate css hot reloading
+OpalHotReloader::CssReloader::reload() to it like below
+
+#+BEGIN_SRC ruby
+  def reload(e)
+    reload_request = JSON.parse(`e.data`)
+    if reload_request[:type] == "ruby"
+      puts "Reloading ruby #{reload_request[:filename]}"
+      eval reload_request[:source_code]
+      if @reload_post_callback
+        @reload_post_callback.call
+      else
+        puts "not reloading code"
+      end
+    end
+    if reload_request[:type] == "css"
+      @css_reloader.reload(reload_request)
+    end
+  end
+
+
+#+END_SRC
+
+* CssReloader
+  
+For our combination of [[http://refactoring.com/catalog/extractMethod.html][Extract Method]] and [[http://refactoring.com/catalog/extractClass.html][Extract Class]], we simply
+relocate the code to a ~reload() method of the new class.  We don't
+have tests yet, so we do it manually.  The code still works!  Here is
+the code.
+
+#+BEGIN_SRC ruby
+require 'native'
+class OpalHotReloader
+  class CssReloader
+
+    def reload(reload_request)
+      url = reload_request[:url]
+      %x{
+        var toAppend = "t_hot_reload=" + (new Date()).getTime();
+        var links = document.getElementsByTagName("link");
+        for (var i = 0; i < links.length; i++) {
+          var link = links[i];
+          if (link.rel === "stylesheet" && link.href.indexOf(#{url}) >= 0) {
+            if (link.href.indexOf("?") === -1) {
+              link.href += "?" + toAppend;
+            } else {
+              if (link.href.indexOf("t_hot_reload") === -1) {
+                link.href += "&" + toAppend;
+              } else {
+                link.href = link.href.replace(/t_hot_reload=\d{13}/, toAppend)
+              }
+            }
+          }
+        }
+      }
+    end
+
+  end
+end
+
+#+END_SRC  
+
+
+
+* Writing tests
+Now that we've verified it still works as expected.  We will write
+some tests.  We'll use [[https://github.com/opal/opal-rspec][opal-rspec]], which is a popular choice in the
+opal community, and I will start calling them specs as appropriate.
+
+Because of how we reload css via direct maninpulation of stylesheet
+links in the ~document~, I was posed with the problem of how to set up
+a test.  I could create stylesheet links in the actual DOM of what
+runs the specs (fairly easy to do), but I don't like the idea of
+calling out to the global document.  I want to be able to inject a
+/test document/ for the spec, and the real ~document~ for the actual
+application. Fortunately, we can dispense with standard dependency
+injection (constructor, setter, interface) altogether and just pass
+the "document" in the parameters to the method. 
+
+Here's where it gets little tricky. To do hot css reloading we have to
+manipulate the browser DOM via the global ~document~ object. This is
+preset interface and not under my control. Because of the interface
+between Opal objects and Javascript objects (described somewhat [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][here]])
+we'll want to create suitable test doubles in pure javascript.  While
+opal-rspec gives you the full power of rspec's mock library, these
+test doubles are opal objects which won't act the way the javascript
+objects in question will.
+
+To support this conveniently, I've created two methods.  
+- ~create_link()~ to create the link DOM opejct and
+- ~fake_links_document()~ which returns both the test double for ~document~ which 
+responds to the ~getElementsByTagName('link')~ and the link itself so
+I can check whether it has been correctly altered.
+
+#+BEGIN_SRC ruby
+  def create_link( href)
+    %x|
+    var ss = document.createElement("link");
+    ss.type = "text/css";
+    ss.rel = "stylesheet";
+    ss.href = #{href};
+    return ss;
+  |
+  end
+
+  def fake_links_document(href)
+    link = create_link(href)
+    doc = `{ getElementsByTagName: function(name) { links = [ #{link}]; return links;}}`
+    { link: link, document: doc}
+  end
+
+#+END_SRC
+
+To suport this "parameter injection" we need to change the existing interface.
+
+#+BEGIN_SRC ruby
+# in OpalHotReloader#reload()
+# instead of calling it this way
+@css_reloader.reload(reload_request)
+# we pass in the real browser document
+@css_reloader.reload(reload_request, `document`)
+#+END_SRC
+
+and we change the signature of the ~OpalHotReloard::CssReloader#reload()~
+
+#+BEGIN_SRC ruby
+# from
+def reload(reload_request) 
+# to
+def reload(reload_request, document) 
+#+END_SRC
+
+We need to change ~OpalHotReloard::CssReloader~ appropriately
+
+#+BEGIN_SRC ruby
+  require 'native'
+  class OpalHotReloader
+    class CssReloader
+
+      def reload(reload_request, document) #  pass in the "document"
+        url = reload_request[:url]
+        %x{
+          var toAppend = "t_hot_reload=" + (new Date()).getTime();
+          // invoke it here
+          var links = #{document}.getElementsByTagName("link");
+          for (var i = 0; i < links.length; i++) {
+            var link = links[i];
+            if (link.rel === "stylesheet" && link.href.indexOf(#{url}) >= 0) {
+              if (link.href.indexOf("?") === -1) {
+                link.href += "?" + toAppend;
+              } else {
+                if (link.href.indexOf("t_hot_reload") === -1) {
+                  link.href += "&" + toAppend;
+                } else {
+                  link.href = link.href.replace(/t_hot_reload=\d{13}/, toAppend)
+                }
+              }
+            }
+          }
+        }
+      end
+
+    end
+  end
+
+#+END_SRC  
+
+We test out the new interface and it still works
+
+* The specs with the new interface
+
+Now we can write specs and inject our own test doubles for ~document~.
+There are 3 cases we want to handle
+- a plain stylesheet link where we add the hot reload argument
+- updating an already updated hot reload argument
+- appending an additional parameter to a stylesheet link that has a parameter
+
+ 
+#+BEGIN_SRC ruby
+require 'native'
+require 'opal_hot_reloader'
+require 'opal_hot_reloader/css_reloader'
+describe OpalHotReloader::CssReloader do
+
+  def create_link( href)
+    %x|
+    var ss = document.createElement("link");
+    ss.type = "text/css";
+    ss.rel = "stylesheet";
+    ss.href = #{href};
+    return ss;
+  |
+  end
+
+  def fake_links_document(href)
+    link = create_link(href)
+    doc = `{ getElementsByTagName: function(name) { links = [ #{link}]; return links;}}`
+    { link: link, document: doc}
+  end
+
+
+  context 'Rack::Sass::Plugin' do
+    it 'should add t_hot_reload to a css path' do
+      css_path = 'stylesheets/base.css'
+      doubles = fake_links_document(css_path)
+      link = Native(doubles[:link])
+      expect(link[:href]).to match /#{Regexp.escape(css_path)}$/
+      subject.reload({ url: css_path}, doubles[:document])
+      expect(link[:href]).to match /#{Regexp.escape(css_path)}\?t_hot_reload=\d+/
+    end
+
+    it 'should update t_hot_reload argument if there is one already' do 
+      css_path = 'stylesheets/base.css?t_hot_reload=1111111111111'
+      doubles = fake_links_document(css_path)
+      link = Native(doubles[:link])
+      expect(link[:href]).to match /#{Regexp.escape(css_path)}$/
+      subject.reload({ url: css_path}, doubles[:document])
+      expect(link[:href]).to match /#{Regexp.escape('stylesheets/base.css?t_hot_reload=')}(\d)+/
+      expect($1).to_not eq '1111111111111'
+    end
+
+    it 'should append t_hot_reload if there are existing arguments' do
+      css_path = 'stylesheets/base.css?some-arg=1'
+      doubles = fake_links_document(css_path)
+      link = Native(doubles[:link])
+      expect(link[:href]).to match /#{Regexp.escape(css_path)}$/
+      subject.reload({ url: css_path}, doubles[:document])
+      expect(link[:href]).to match /#{Regexp.escape(css_path)}\&t_hot_reload=(\d)+/
+    end
+  end
+
+
+end
+
+#+END_SRC
+
+
+* Specs pass - Safe to refactor
+
+Now that we have test coverage for the 3 cases, we can now rewrite the
+~reload()~ method in Ruby/Opal and we have the safety net the specs
+will let us know if we did it correctly.  For development, it will be
+handy to have both versions code side by side both for coding and
+testing. I did a little trick of having Javascript and Ruby versions
+of the ~reload()~ and then having the ~reload()~ call either of those
+as needed.  The code looked like this
+
+#+BEGIN_SRC ruby
+require 'native'
+class OpalHotReloader
+  class CssReloader
+
+    def reload(reload_request, document)
+      # currently using the Ruby version
+      reload_ruby(reload_request, document)
+      # reload_js(reload_request, document)
+    end
+
+    def reload_ruby(reload_request, document)
+      url = reload_request[:url]
+      puts "Reloading CSS: #{url}"
+      to_append = "t_hot_reload=#{Time.now.to_i}"
+      links = Native(`document.getElementsByTagName("link")`)
+      (0..links.length-1).each { |i|
+        link = links[i]
+        if link.rel == 'stylesheet' && link.href.index(url) >= 0 # find_matching_stylesheets(link.href, url)
+          if  link.href !~ /\?/
+            link.href += "?#{to_append}"
+          else
+            if link.href !~ /t_hot_reload/
+              link.href += "&#{to_append}"
+            else
+              link.href = link.href.sub(/t_hot_reload=\d{13}/, to_append)
+            end
+          end
+        end
+      }
+    end
+    
+    def reload_js(reload_request, document)
+      url = reload_request[:url]
+      %x{
+        var toAppend = "t_hot_reload=" + (new Date()).getTime();
+        var links = #{document}.getElementsByTagName("link");
+        for (var i = 0; i < links.length; i++) {
+          var link = links[i];
+          if (link.rel === "stylesheet" && link.href.indexOf(#{url}) >= 0) {
+            if (link.href.indexOf("?") === -1) {
+              link.href += "?" + toAppend;
+            } else {
+              if (link.href.indexOf("t_hot_reload") === -1) {
+                link.href += "&" + toAppend;
+              } else {
+                link.href = link.href.replace(/t_hot_reload=\d{13}/, toAppend)
+              }
+            }
+          }
+        }
+      }
+    end
+
+  end
+end
+
+
+#+END_SRC
+
+
+We implement the Ruby version and the specs pass. Now that the Ruby
+version works working we don't need the Javascript version, we can
+remove the unnecessary code.
+
+#+BEGIN_SRC ruby
+require 'native'
+class OpalHotReloader
+  class CssReloader
+
+    def reload(reload_request, document)
+      url = reload_request[:url]
+      puts "Reloading CSS: #{url}"
+      to_append = "t_hot_reload=#{Time.now.to_i}"
+      links = Native(`document.getElementsByTagName("link")`)
+      (0..links.length-1).each { |i|
+        link = links[i]
+        if link.rel == 'stylesheet' && link.href.index(url) >= 0 # find_matching_stylesheets(link.href, url)
+          if  link.href !~ /\?/
+            link.href += "?#{to_append}"
+          else
+            if link.href !~ /t_hot_reload/
+              link.href += "&#{to_append}"
+            else
+              link.href = link.href.sub(/t_hot_reload=\d{13}/, to_append)
+            end
+          end
+        end
+      }
+    end
+    
+
+  end
+end
+
+
+#+END_SRC
+
+Now I'm ready to be able to extend this class to support css from Rails' asset pipeline!
+
