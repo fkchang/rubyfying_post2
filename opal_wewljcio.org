@@ -1,3 +1,4 @@
+#+OPTIONS: toc:nil num:nil
 * WEWLJCIO - Working Effectgively with Legacy Javascript Code in Opal
 
 I've been working on [[https://github.com/fkchang/opal-hot-reloader][opal-hot-reloader]], a hot reloader for [[http://opalrb.org][Opal]]
