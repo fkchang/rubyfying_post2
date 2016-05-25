@@ -345,7 +345,7 @@ class OpalHotReloader
       links = Native(`document.getElementsByTagName("link")`)
       (0..links.length-1).each { |i|
         link = links[i]
-        if link.rel == 'stylesheet' && link.href.index(url) >= 0
+        if link.rel == 'stylesheet' && link.href.index(url)
           if  link.href !~ /\?/
             link.href += "?#{to_append}"
           else
@@ -404,7 +404,7 @@ class OpalHotReloader
       links = Native(`document.getElementsByTagName("link")`)
       (0..links.length-1).each { |i|
         link = links[i]
-        if link.rel == 'stylesheet' && link.href.index(url) >= 0 
+        if link.rel == 'stylesheet' && link.href.index(url)
           if  link.href !~ /\?/
             link.href += "?#{to_append}"
           else
