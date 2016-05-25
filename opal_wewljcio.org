@@ -215,7 +215,7 @@ Then we call it with the new signature.
 @css_reloader.reload(reload_request, `document`)
 #+END_SRC
 
-The class at this point looks liek this
+The class at this point looks like this
 
 #+BEGIN_SRC ruby
   require 'native'
