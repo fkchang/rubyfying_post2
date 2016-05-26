@@ -45,6 +45,14 @@ site. Create a new Rails project with the following command:
 To use =react.rb=, you need to add 3 gems to your Gemfile:
 reactive-ruby[fn:gem_names], react-rails and therubyracer
 
+#+ATTR_HTML: :target "_blank"
+** Update
+Since this article was written there has been Rails generator code
+that has been written as a [[https://rubygems.org/gems/reactive_rails_generator][standalone gem]] that is pending integration
+with react.rb gem.  Some of conventions described in this article,
+which currently match that of existing documentation and sample Rails
+project in react.rb will likely be changing as part of that.
+
 #+BEGIN_SRC ruby
 gem 'reactive-ruby', '0.7.29' # nail down compatible version w/ pre 0.14 react-rails
 gem 'react-rails', '1.3.2' # react.rb not compatible ith 1.4.* yet so use this one
@@ -432,8 +440,7 @@ application.js, as below.  Use of application.rb will automatically load the fil
 //= require opal
 //= require greeter
 //= require_self
-Opal.load('an_opal_file');
-Opal.load('another_opal_file');
+Opal.load('greeter'); // you have to load the opal file
 // etc.
 #+END_SRC
 
