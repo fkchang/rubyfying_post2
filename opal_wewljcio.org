@@ -2,29 +2,32 @@
 * WEWLJCIO - Working Effectively with Legacy Javascript Code in Opal
 
 I've been working on [[https://github.com/fkchang/opal-hot-reloader][opal-hot-reloader]], a hot reloader for [[http://opalrb.org][Opal]]
-applications including [[http://reactrb.org][built in react.rb]] support.  I merged a pull
+applications including built in [[http://reactrb.org][react.rb]] support.  I merged a pull
 request (thanks Brock!) that added hot css reloading. The code worked,
-but it is primarily in Javascript and did not have tests.  To make the
-code easier to read, maintain and extend, I want to both add tests and
-convert it to Ruby/Opal.  In particular, I plan to extend the code to
-handle css served by the [[http://rubyonrails.org][Ruby on Rails]] pipeline so I want the code to
-be amenable to that.
+but it was implemented primarily in Javascript and did not have tests.
+To make the code easier to read, maintain and extend, I wanted to both
+add tests and convert it to Ruby/Opal.  In particular, I plan to
+extend the code to handle css served by the [[http://rubyonrails.org][Ruby on Rails]] pipeline so
+I want to make the code to be amenable to that.
 
-Now if this sounds a bit like [[http://c2.com/cgi/wiki?WorkingEffectivelyWithLegacyCode][Working Effectively With Legacy Code]] by
-Michael Feathers, it should, and thus the title.  This situation does
-present a slightly different conditions than many refactorings, i.e.:
-- The desired to convert from languages - Javascript to Ruby, of which
-  the interface between those 2 languages affects things
+Now if this situation sounds a bit like [[http://c2.com/cgi/wiki?WorkingEffectivelyWithLegacyCode][Working Effectively With
+Legacy Code]] by Michael Feathers, it should, and thus the title of this
+post.  This particular situation does present a slightly different
+conditions than many refactorings, i.e.:
+- The desired to convert from languages - Javascript to Ruby (or
+  transpiled Ruby). The interface between those 2 languages
+  does affects how things need to proceed
 - The predefined browser API
 
-Hopefully this brings some different insights for Opal developers.
+Hopefully, this article can bring some different insights for Opal
+developers.
 
 * Where to start?
 
-Let's look at the code.  An additional if clause was added to
+Let's look at the code.  An additional ~if clause~ was added to
 ~OpalHotReloader#reload()~ that performs the css hot reloading on the
-client side. It's mostly implemented in Javascript via an Opal
-x-string.
+client side. The functionality is implemented in Javascript via an
+Opal x-string.
 
 #+BEGIN_SRC ruby
   def reload(e)
@@ -71,13 +74,15 @@ x-string.
 
 * First steps
 
-The first thing I notices is a formerly smallish method has now
-tripled in size and has a new responsibilty.  I'll want to refactor
-that code out the body of the ~reload()~ method as a method of a new
-class, ~OpalHotReloader::CssReloader~ dedicated to just css hot
-reloading ([[https://en.wikipedia.org/wiki/Single_responsibility_principle][SRP]]).  In this case, we'll instantiate this class instance
-as @css_reloader in the initializer for ~OpalHotReloader~ and then
-delegate css hot reloading to that instance in ~OpalHotReloader::CssReloader::reload()~. 
+The first thing I noticed was a formerly smallish ~reload()~ method
+had tripled in size and gained a new responsibilty - css hot
+reloading.  I'll want to refactor that code out the body of the
+~reload()~ method as a method of a new class,
+~OpalHotReloader::CssReloader~ dedicated to just css hot reloading
+([[https://en.wikipedia.org/wiki/Single_responsibility_principle][SRP]]).  In this case, we'll instantiate this class instance as
+@css_reloader in the initializer for ~OpalHotReloader~ and then
+delegate css hot reloading to that instance in
+~OpalHotReloader::CssReloader::reload()~.
 
 #+BEGIN_SRC ruby
   def reload(e)
@@ -145,31 +150,32 @@ some tests.  We'll use [[https://github.com/opal/opal-rspec][opal-rspec]], which
 opal community and my preferred test framework for Ruby.  I will start
 calling the tests specs as appropriate.
 
-Because of how we reload css via direct maninpulation of stylesheet
-links in the ~document~, I was posed with the problem of how to set up
-a test.  I could create stylesheet links in the actual DOM of what
-runs the specs (fairly easy to do), but I don't like the idea of
-calling out to the global ~document~.  I want to be able to inject a
-/test document/ for the spec, and inject the real ~document~ for the
-actual application.  Fortunately, we can dispense with standard
-dependency injection (constructor, setter, interface) techniques
-altogether and just pass the "document" in as a parameter to the
-method.
+Because of how we hot reload css via direct maninpulation of
+stylesheet links in the ~document~, I was posed with the problem of
+how to set up a test.  I could create stylesheet links in the actual
+DOM of spec runner (fairly easy to do), but I don't like the idea of
+calling out to methods the global ~document~ object.  I want to be
+able to inject a /test document/ for the spec, and inject the real
+~document~ for the actual application.  Fortunately, we can dispense
+with standard dependency injection (constructor, setter, interface)
+techniques altogether and just pass the "document" in as a parameter
+to the method.
 
 Here's where it gets little tricky. To do hot css reloading we have to
-manipulate the browser DOM via the global ~document~ object. This is
-preset interface and not under my control.  Because of the interface
-between Opal objects and Javascript objects (some details described
-[[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][here]]) we'll want to create suitable test doubles in pure javascript.
-While opal-rspec gives you the full power of rspec's mock library,
-these test doubles are opal objects which won't act the way the
-javascript objects in question will.  We'll need to create our own.
+manipulate the browser DOM via the global ~document~ object. This
+browser interface is not under my control, so we have to abide by this
+interface.  Because of the interface between Opal objects and
+Javascript objects (some details described [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][here]]) we'll want to create
+suitable test doubles in pure Javascript.  While opal-rspec gives you
+the full power of rspec's mock library, these test doubles are Opal
+objects which won't act the way the javascript objects in question
+will.  We'll need to create our own.
 
 To support this conveniently, I've created two methods.  
 - ~create_link()~ to create the link DOM object that will get altered and
 - ~fake_links_document()~ a convenience method which returns both the
-  test double for ~document~ which
-responds to the ~getElementsByTagName('link')~ and the link itself so
+  test double for ~document~ which responds to the
+  ~getElementsByTagName('link')~ and the link itself so
 I can check whether it has been correctly altered.
 
 #+BEGIN_SRC ruby
@@ -192,10 +198,7 @@ I can check whether it has been correctly altered.
 #+END_SRC
 
 To suport this new "parameter injection" we need to change the
-existing interface. When we call it, it will change like this.
-
-
-We change the signature of the
+existing interface. We change the signature of the
 ~OpalHotReloard::CssReloader#reload()~ to take in the document
 
 #+BEGIN_SRC ruby
@@ -388,9 +391,9 @@ end
 #+END_SRC
 
 
-We implement the Ruby version and the specs pass.  Now that the Ruby
-version works, we don't need the Javascript version.  We can remove the
-unnecessary code.
+We implement the Ruby version, a line by line translastion, and the
+specs pass.  Now that the Ruby version works, we don't need the
+Javascript version.  We can remove the unnecessary code.
 
 #+BEGIN_SRC ruby
 require 'native'
