@@ -74,13 +74,13 @@ Opal x-string.
 
 * First steps
 
-The first thing I noticed was a formerly smallish ~reload()~ method
+The first thing I noticed was the formerly smallish ~reload()~ method
 had tripled in size and gained a new responsibilty - css hot
 reloading.  I'll want to refactor that code out the body of the
 ~reload()~ method as a method of a new class,
 ~OpalHotReloader::CssReloader~ dedicated to just css hot reloading
 ([[https://en.wikipedia.org/wiki/Single_responsibility_principle][SRP]]).  In this case, we'll instantiate this class instance as
-@css_reloader in the initializer for ~OpalHotReloader~ and then
+~@css_reloader~ in the initializer for ~OpalHotReloader~ and then
 delegate css hot reloading to that instance in
 ~OpalHotReloader::CssReloader::reload()~.
 
@@ -112,7 +112,6 @@ have tests yet, so we test it manually.  The code still works!  Here
 is the code for the new class.
 
 #+BEGIN_SRC ruby
-require 'native'
 class OpalHotReloader
   class CssReloader
 
@@ -147,15 +146,15 @@ end
 
   Now that we've verified it still works as expected.  We will write
 some tests.  We'll use [[https://github.com/opal/opal-rspec][opal-rspec]], which is a popular choice in the
-opal community and my preferred test framework for Ruby.  I will start
-calling the tests specs as appropriate.
+opal community and my preferred test framework for Ruby.  From here
+on, I will be referring to the tests as specs since I'm using RSpec.
 
 Because of how we hot reload css via direct maninpulation of
 stylesheet links in the ~document~, I was posed with the problem of
 how to set up a test.  I could create stylesheet links in the actual
 DOM of spec runner (fairly easy to do), but I don't like the idea of
-calling out to methods the global ~document~ object.  I want to be
-able to inject a /test document/ for the spec, and inject the real
+calling out to methods the on the global ~document~ object.  I want to
+be able to inject a /test document/ for the spec, and inject the real
 ~document~ for the actual application.  Fortunately, we can dispense
 with standard dependency injection (constructor, setter, interface)
 techniques altogether and just pass the "document" in as a parameter
@@ -168,15 +167,17 @@ interface.  Because of the interface between Opal objects and
 Javascript objects (some details described [[http://funkworks.blogspot.com/2015/06/accessing-javascript-from-opal.html][here]]) we'll want to create
 suitable test doubles in pure Javascript.  While opal-rspec gives you
 the full power of rspec's mock library, these test doubles are Opal
-objects which won't act the way the javascript objects in question
-will.  We'll need to create our own.
+objects which won't act the way the Javascript DOM objects I'm looking
+to mock/stub out will.  We'll need to create our own method of
+creating these test doubles.
 
-To support this conveniently, I've created two methods.  
-- ~create_link()~ to create the link DOM object that will get altered and
-- ~fake_links_document()~ a convenience method which returns both the
-  test double for ~document~ which responds to the
-  ~getElementsByTagName('link')~ and the link itself so
-I can check whether it has been correctly altered.
+To create the doubles, I've created two methods.  
+- ~create_link()~ to create the link DOM object that will get altered
+  to facillitate the css hot reloading and
+- ~fake_links_document()~ a convenience method which returns both a
+  test double for global ~document~ object, which responds to the
+  ~getElementsByTagName('link')~ call and a test double for the link
+  itself, that I will inspect to see whether it has been correctly altered.
 
 #+BEGIN_SRC ruby
   def create_link( href)
@@ -221,7 +222,6 @@ Then we call it with the new signature.
 The class at this point looks like this
 
 #+BEGIN_SRC ruby
-  require 'native'
   class OpalHotReloader
     class CssReloader
 
@@ -255,13 +255,14 @@ The class at this point looks like this
 
 We test out the new interface and it still works. Yay!
 
-* Writing  specs with the new interface
+* Writing specs with the new interface
 
 Now we can write specs and inject our own test doubles for ~document~.
 There are 3 cases we want to prove are handled correctly
-- A plain stylesheet link where we add the hot reload argument.
-- Updating an already updated hot reload argument.
-- Appending an additional parameter to a stylesheet link that has a parameter.
+- A plain stylesheet link where we add the hot reload argument for the first time.
+- Updating a link that has already been updated with a hot reload argument.
+- Appending an additional hot reload argument parameter to a
+  stylesheet link that already has a parameter.
  
 #+BEGIN_SRC ruby
 require 'native'
