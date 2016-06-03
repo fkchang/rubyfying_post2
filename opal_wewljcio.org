@@ -8,16 +8,16 @@ but it was implemented primarily in Javascript and did not have tests.
 To make the code easier to read, maintain and extend, I wanted to both
 add tests and convert it to Ruby/Opal.  In particular, I plan to
 extend the code to handle css served by the [[http://rubyonrails.org][Ruby on Rails]] pipeline so
-I want to make the code to be amenable to that.
+I want to shape the code to be more amenable to extension.
 
 Now if this situation sounds a bit like [[http://c2.com/cgi/wiki?WorkingEffectivelyWithLegacyCode][Working Effectively With
 Legacy Code]] by Michael Feathers, it should, and thus the title of this
-post.  This particular situation does present a slightly different
-conditions than many refactorings, i.e.:
-- The desired to convert from languages - Javascript to Ruby (or
-  transpiled Ruby). The interface between those 2 languages
-  does affects how things need to proceed
-- The predefined browser API
+post.  This particular situation does present a slightly different set
+of conditions than many refactorings, i.e.:
+- The desire to convert languages - Javascript to Ruby (or transpiled
+  Ruby via Opal). The interface between those Javascript and Opal
+  objects in the browser affects how things need to proceed.
+- The predefined browser API and test doubles
 
 Hopefully, this article can bring some different insights for Opal
 developers.
@@ -44,7 +44,6 @@ Opal x-string.
     end
     # the new css hot reloading code
     if reload_request[:type] == "css"
-         if reload_request[:type] == "css"
       url = reload_request[:url]
       puts "Reloading CSS: #{url}"
       # Work outsources Javascript via x-string
@@ -79,7 +78,7 @@ had tripled in size and gained a new responsibilty - css hot
 reloading.  I'll want to refactor that code out the body of the
 ~reload()~ method as a method of a new class,
 ~OpalHotReloader::CssReloader~ dedicated to just css hot reloading
-([[https://en.wikipedia.org/wiki/Single_responsibility_principle][SRP]]).  In this case, we'll instantiate this class instance as
+([[https://en.wikipedia.org/wiki/Single_responsibility_principle][SRP]]).  We'll instantiate this class instance as
 ~@css_reloader~ in the initializer for ~OpalHotReloader~ and then
 delegate css hot reloading to that instance in
 ~OpalHotReloader::CssReloader::reload()~.
@@ -97,7 +96,7 @@ delegate css hot reloading to that instance in
       end
     end
     if reload_request[:type] == "css"
-      @css_reloader.reload(reload_request)
+      @css_reloader.reload(reload_request) # extracted method called here
     end
   end
 
@@ -107,7 +106,7 @@ delegate css hot reloading to that instance in
 * CssReloader
   
 For our combination of [[http://refactoring.com/catalog/extractMethod.html][Extract Method]] and [[http://refactoring.com/catalog/extractClass.html][Extract Class]], we simply
-relocate the code to a ~reload()~ method of the new class.  We don't
+relocated the code to a ~reload()~ method of the new class.  We don't
 have tests yet, so we test it manually.  The code still works!  Here
 is the code for the new class.
 
@@ -150,7 +149,7 @@ opal community and my preferred test framework for Ruby.  From here
 on, I will be referring to the tests as specs since I'm using RSpec.
 
 Because of how we hot reload css via direct maninpulation of
-stylesheet links in the ~document~, I was posed with the problem of
+stylesheet links in the ~document~, I was faced with the problem of
 how to set up a test.  I could create stylesheet links in the actual
 DOM of spec runner (fairly easy to do), but I don't like the idea of
 calling out to methods the on the global ~document~ object.  I want to
@@ -171,7 +170,7 @@ objects which won't act the way the Javascript DOM objects I'm looking
 to mock/stub out will.  We'll need to create our own method of
 creating these test doubles.
 
-To create the doubles, I've created two methods.  
+To create the doubles, I've created two methods:  
 - ~create_link()~ to create the link DOM object that will get altered
   to facillitate the css hot reloading and
 - ~fake_links_document()~ a convenience method which returns both a
@@ -258,7 +257,7 @@ We test out the new interface and it still works. Yay!
 * Writing specs with the new interface
 
 Now we can write specs and inject our own test doubles for ~document~.
-There are 3 cases we want to prove are handled correctly
+There are 3 cases we want to prove are handled correctly:
 - A plain stylesheet link where we add the hot reload argument for the first time.
 - Updating a link that has already been updated with a hot reload argument.
 - Appending an additional hot reload argument parameter to a
@@ -431,3 +430,4 @@ end
 
 Now I'm ready to be able to extend this class to support css from Rails' asset pipeline!
 
+Thanks to [[http://blog.scottnelsonsmith.com][Scott Smith]] for proofreading this.
